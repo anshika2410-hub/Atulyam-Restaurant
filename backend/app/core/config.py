@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "atulyam_secure_random_jwt_secret_key_2026_dev"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
-    PASSWORD_RESET_EXPIRE_MINUTES: int = 30
 
+    PASSWORD_RESET_EXPIRE_MINUTES: int = 30
     FRONTEND_URL: str = "http://localhost:5173"
 
     SMTP_HOST: str = ""
@@ -25,7 +25,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "mysql+pymysql://root:password@localhost:3306/atulyam_db"
     SQLITE_DEV_FALLBACK: bool = True
 
-    ALLOWED_ORIGINS: List[str] = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+    ALLOWED_ORIGINS: List[str] = [
+        "https://atulyam-restaurant.vercel.app",
+        "https://atulyam-restaurant-4epaok6so-anshika21.vercel.app",
         "http://localhost:5173",
         "http://localhost:3000",
         "http://127.0.0.1:5173",
@@ -34,7 +36,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            ".env"
+            ".env",
         ),
         env_file_encoding="utf-8",
         extra="ignore",
