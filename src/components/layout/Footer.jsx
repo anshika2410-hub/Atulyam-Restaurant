@@ -7,6 +7,7 @@ import {
   Mail,
   Clock3,
   ArrowUpRight,
+  ArrowUp,
   Instagram,
   Facebook,
 } from 'lucide-react';
@@ -290,7 +291,7 @@ export const Footer = () => {
     anshikaagr.webdev
   </a>
 </span>
-
+{/* BACK TO TOP */} <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth', }) } aria-label="Back to top" title="Back to Top" className="group ml-1 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-[#f28a2e] hover:border-[#f28a2e] hover:bg-[#f28a2e]/5 transition-all duration-300" > <ArrowUp size={15} strokeWidth={1.5} className="transition-transform duration-300 group-hover:-translate-y-1" /> </button>
   </div>
 
 </div>

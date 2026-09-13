@@ -1,12 +1,13 @@
 import React from "react";
-import { Routes, Route, useLocation, Link } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
-
+import AdminOffersPage from "./pages/admin/OffersPage.jsx";
+import ResetPasswordPage from "./pages/admin/ResetPasswordPage";
 import PageLayout from "./components/layout/PageLayout.jsx";
 import PageTransition from "./components/animation/PageTransition.jsx";
 import ScrollToTop from "./components/ScrollToTop.jsx";
-
-
+import OffersPage from "./pages/public/OffersPage.jsx";
+import AdminMenuPage from "./pages/admin/MenuPage.jsx";
 import HomePage from "./pages/public/HomePage.jsx";
 import AboutPage from "./pages/public/AboutPage.jsx";
 import MenuPage from "./pages/public/MenuPage.jsx";
@@ -15,11 +16,31 @@ import CateringPage from "./pages/public/CateringPage.jsx";
 import ContactPage from "./pages/public/ContactPage.jsx";
 import ReservationPage from "./pages/public/ReservationPage.jsx";
 import OrderOnlinePage from "./pages/public/OrderOnlinePage.jsx";
-
+import OrdersPage from "./pages/admin/OrdersPage.jsx";
+import AdminGallery from "./pages/admin/AdminGallery";
 import Container from "./components/ui/Container.jsx";
 import Button from "./components/ui/Button.jsx";
-
+import AdminCatering from "./pages/admin/AdminCatering";
 import { UtensilsCrossed } from "lucide-react";
+import CheckoutPage from "./pages/public/CheckoutPage.jsx";
+import OrderConfirmationPage from "./pages/public/OrderConfirmationPage.jsx";
+import OrderTrackingPage from "./pages/public/OrderTrackingPage.jsx";
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import CustomerLoginPage from "./pages/public/CustomerLoginPage.jsx";
+import {
+  CustomerAuthProvider,
+  useCustomerAuth,
+} from "./context/CustomerAuthContext";
+import CustomerOrdersPage from "./pages/public/CustomerOrdersPage.jsx";
+import CustomerProfilePage from "./pages/public/CustomerProfilePage.jsx";
+import CustomerSignupPage from "./pages/public/CustomerSignupPage.jsx";
+import { CustomerAddressProvider } from "./context/CustomerAddressContext";
+import CustomerAddressesPage from "./pages/public/CustomerAddressesPage.jsx";
+import CustomerOrderDetailsPage from "./pages/public/CustomerOrderDetailsPage.jsx";
+// Admin pages
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+
 
 const PagePlaceholder = ({ title, description }) => (
   <Container className="py-36 min-h-[70vh] flex flex-col items-center justify-center text-center">
@@ -40,165 +61,365 @@ const PagePlaceholder = ({ title, description }) => (
       {description}
     </p>
 
-    <Link to="/">
-      <Button variant="secondary" size="md">
-        Return Home
-      </Button>
-    </Link>
+    <Button
+      variant="secondary"
+      size="md"
+      onClick={() => window.location.href = "/"}
+    >
+      Return Home
+    </Button>
 
   </Container>
 );
 
-function App() {
+
+// ================= PROTECTED ADMIN ROUTE =================
+
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, authChecked } = useAuth();
+
+  if (!authChecked) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
+  }
+
+  return children;
+};
+
+const CustomerProtectedRoute = ({ children }) => {
+  const { isAuthenticated, authChecked } = useCustomerAuth();
+  const location = useLocation();
+
+  if (!authChecked) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/customer/login"
+        state={{
+          from: location.pathname + location.search,
+        }}
+        replace
+      />
+    );
+  }
+
+  return children;
+};
+
+// ================= APP ROUTES =================
+
+function AppRoutes() {
   const location = useLocation();
 
   return (
-    <PageLayout>
+    <AnimatePresence mode="wait">
 
-      <ScrollToTop />
+      <Routes
+        location={location}
+        key={location.pathname}
+      >
 
-      <AnimatePresence mode="wait">
-        <Routes
-          location={location}
-          key={location.pathname}
-        >
+        {/* ================= HOME ================= */}
 
-          {/* ================= HOME ================= */}
-          <Route
-            path="/"
-            element={
+        <Route
+          path="/"
+          element={
+            <PageTransition>
+              <HomePage />
+            </PageTransition>
+          }
+        />
+
+
+<Route
+  path="/customer/login"
+  element={
+    <PageTransition>
+      <CustomerLoginPage />
+    </PageTransition>
+  }
+/>
+
+<Route
+  path="/customer/signup"
+  element={
+    <PageTransition>
+      <CustomerSignupPage />
+    </PageTransition>
+  }
+/>
+<Route
+  path="/customer/addresses"
+  element={
+    <CustomerProtectedRoute>
+      <PageTransition>
+        <CustomerAddressesPage />
+      </PageTransition>
+    </CustomerProtectedRoute>
+  }
+/>
+
+<Route
+  path="/customer/orders"
+  element={<CustomerOrdersPage />}
+/>
+
+<Route
+  path="/customer/orders/:orderId"
+  element={<CustomerOrderDetailsPage />}
+/>
+
+        {/* ================= ABOUT ================= */}
+
+        <Route
+          path="/about"
+          element={
+            <PageTransition>
+              <AboutPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= MENU ================= */}
+
+        <Route
+          path="/menu"
+          element={
+            <PageTransition>
+              <MenuPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= GALLERY ================= */}
+
+        <Route
+          path="/gallery"
+          element={
+            <PageTransition>
+              <GalleryPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= CATERING ================= */}
+
+        <Route
+          path="/catering"
+          element={
+            <PageTransition>
+              <CateringPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= CONTACT ================= */}
+
+        <Route
+          path="/contact"
+          element={
+            <PageTransition>
+              <ContactPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= RESERVATION ================= */}
+
+        <Route
+          path="/reservation"
+          element={
+            <PageTransition>
+              <ReservationPage />
+            </PageTransition>
+          }
+        />
+
+        {/* ================= ORDER ONLINE ================= */}
+
+        <Route
+  path="/order-online"
+  element={
+    <CustomerProtectedRoute>
+      <PageTransition>
+        <OrderOnlinePage />
+      </PageTransition>
+    </CustomerProtectedRoute>
+  }
+/>
+
+
+{/* ================= CHECKOUT ================= */}
+
+<Route
+  path="/checkout"
+  element={
+    <CustomerProtectedRoute>
+      <PageTransition>
+        <CheckoutPage />
+      </PageTransition>
+    </CustomerProtectedRoute>
+  }
+/>
+<Route
+  path="/order-confirmation/:orderNumber"
+  element={
+    <PageTransition>
+      <OrderConfirmationPage />
+    </PageTransition>
+  }
+/>
+<Route
+  path="/customer/profile"
+  element={<CustomerProfilePage />}
+/>
+<Route
+  path="/order-tracking"
+  element={
+    <PageTransition>
+      <OrderTrackingPage />
+    </PageTransition>
+  }
+/>
+
+<Route
+  path="/order-tracking/:orderNumber"
+  element={
+    <PageTransition>
+      <OrderTrackingPage />
+    </PageTransition>
+  }
+/>
+
+        {/* ================= OFFERS ================= */}
+<Route
+  path="/offers"
+  element={
+    <PageTransition>
+      <OffersPage />
+    </PageTransition>
+  }
+/>
+
+
+        {/* ================================================= */}
+        {/* ================= ADMIN LOGIN ==================== */}
+        {/* ================================================= */}
+
+        <Route
+          path="/admin/login"
+          element={
+            <PageTransition>
+              <AdminLogin />
+            </PageTransition>
+          }
+        />
+
+
+        {/* ================================================= */}
+        {/* ================= ADMIN DASHBOARD ================ */}
+        {/* ================================================= */}
+
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
               <PageTransition>
-                <HomePage />
+                <AdminDashboard />
               </PageTransition>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+  path="/admin/offers"
+  element={
+    <ProtectedRoute>
+      <PageTransition>
+        <AdminOffersPage />
+      </PageTransition>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/reset-password"
+  element={<ResetPasswordPage />}
+/>
+<Route
+  path="/admin/catering"
+  element={
+    <ProtectedRoute>
+      <AdminCatering />
+    </ProtectedRoute>
+  }
+/>
+
+          <Route
+            path="/admin/orders"
+            element={
+              <ProtectedRoute>
+                <PageTransition>
+                  <OrdersPage />
+                </PageTransition>
+              </ProtectedRoute>
             }
           />
 
-          {/* ================= ABOUT ================= */}
-          <Route
-            path="/about"
-            element={
-              <PageTransition>
-                <AboutPage />
-              </PageTransition>
-            }
-          />
+<Route
+  path="/admin/menu"
+  element={
+    <ProtectedRoute>
+      <PageTransition>
+        <AdminMenuPage />
+      </PageTransition>
+    </ProtectedRoute>
+  }
+/>
 
-          {/* ================= MENU ================= */}
-          <Route
-            path="/menu"
-            element={
-              <PageTransition>
-                <MenuPage />
-              </PageTransition>
-            }
-          />
+<Route
+  path="/admin/gallery"
+  element={<AdminGallery />}
+/>
+        {/* ================= 404 ================= */}
 
-          {/* ================= GALLERY ================= */}
-          <Route
-            path="/gallery"
-            element={
-              <PageTransition>
-                <GalleryPage />
-              </PageTransition>
-            }
-          />
+        <Route
+          path="*"
+          element={
+            <PageTransition>
+              <PagePlaceholder
+                title="Page Not Found"
+                description="The page you are looking for could not be found."
+              />
+            </PageTransition>
+          }
+        />
 
-          {/* ================= CATERING ================= */}
-          <Route
-            path="/catering"
-            element={
-              <PageTransition>
-                <CateringPage />
-              </PageTransition>
-            }
-          />
+      </Routes>
 
-          {/* ================= CONTACT ================= */}
-          <Route
-            path="/contact"
-            element={
-              <PageTransition>
-                <ContactPage />
-              </PageTransition>
-            }
-          />
+    </AnimatePresence>
+  );
+};
 
-          {/* ================= RESERVATION ================= */}
-          <Route
-            path="/reservation"
-            element={
-              <PageTransition>
-                <ReservationPage />
-              </PageTransition>
-            }
-          />
 
-          {/* ================= ORDER ONLINE ================= */}
-          <Route
-            path="/order-online"
-            element={
-              <PageTransition>
-                <OrderOnlinePage />
-              </PageTransition>
-            }
-          />
+// ================= ROOT APP =================
 
-          {/* ================= OFFERS ================= */}
-          <Route
-            path="/offers"
-            element={
-              <PageTransition>
-                <PagePlaceholder
-                  title="Exclusive Offers"
-                  description="Special dining offers and seasonal experiences will be managed from the admin panel."
-                />
-              </PageTransition>
-            }
-          />
-
-          {/* ================= ADMIN LOGIN ================= */}
-          <Route
-            path="/admin/login"
-            element={
-              <PageTransition>
-                <PagePlaceholder
-                  title="Admin Login"
-                  description="Secure restaurant administration will be built in the admin phase."
-                />
-              </PageTransition>
-            }
-          />
-
-          {/* ================= ADMIN ================= */}
-          <Route
-            path="/admin"
-            element={
-              <PageTransition>
-                <PagePlaceholder
-                  title="Admin Dashboard"
-                  description="Restaurant content and order management will be built here."
-                />
-              </PageTransition>
-            }
-          />
-
-          {/* ================= 404 ================= */}
-          <Route
-            path="*"
-            element={
-              <PageTransition>
-                <PagePlaceholder
-                  title="Page Not Found"
-                  description="The page you are looking for could not be found."
-                />
-              </PageTransition>
-            }
-          />
-
-        </Routes>
-      </AnimatePresence>
-
-    </PageLayout>
+function App() {
+  return (
+    <AuthProvider>
+  <CustomerAuthProvider>
+    <CustomerAddressProvider>
+      <PageLayout>
+        <ScrollToTop />
+        <AppRoutes />
+      </PageLayout>
+    </CustomerAddressProvider>
+  </CustomerAuthProvider>
+</AuthProvider>
   );
 }
 
