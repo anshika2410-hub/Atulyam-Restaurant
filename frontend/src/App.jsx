@@ -21,12 +21,14 @@ import AdminGallery from "./pages/admin/AdminGallery";
 import Container from "./components/ui/Container.jsx";
 import Button from "./components/ui/Button.jsx";
 import AdminCatering from "./pages/admin/AdminCatering";
+import CateringOccasionPage from "./pages/public/CateringOccasionPage.jsx";
 import { UtensilsCrossed } from "lucide-react";
 import CheckoutPage from "./pages/public/CheckoutPage.jsx";
 import OrderConfirmationPage from "./pages/public/OrderConfirmationPage.jsx";
 import OrderTrackingPage from "./pages/public/OrderTrackingPage.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerLoginPage from "./pages/public/CustomerLoginPage.jsx";
+
 import {
   CustomerAuthProvider,
   useCustomerAuth,
@@ -218,7 +220,25 @@ function AppRoutes() {
             </PageTransition>
           }
         />
+{/* ================= CATERING ================= */}
 
+<Route
+  path="/catering"
+  element={
+    <PageTransition>
+      <CateringPage />
+    </PageTransition>
+  }
+/>
+
+<Route
+  path="/catering/:occasion"
+  element={
+    <PageTransition>
+      <CateringOccasionPage />
+    </PageTransition>
+  }
+/>
         {/* ================= CONTACT ================= */}
 
         <Route

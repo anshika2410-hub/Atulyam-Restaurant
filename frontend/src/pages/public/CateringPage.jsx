@@ -1,10 +1,15 @@
-import { motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import {
   ArrowUpRight,
   Check,
   ChefHat,
   UtensilsCrossed,
   Sparkles,
+  X,
+  CalendarDays,
+  Users,
 } from "lucide-react";
 
 const ease = [0.22, 1, 0.36, 1];
@@ -16,6 +21,14 @@ const occasions = [
     text: "Elegant catering crafted for celebrations that deserve to be remembered.",
     image:
       "https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1400&q=90",
+    details:
+      "From intimate ceremonies to grand wedding celebrations, our team creates a beautifully curated dining experience for your guests.",
+    highlights: [
+      "Custom wedding menus",
+      "Live food counters",
+      "Premium presentation",
+      "Dedicated service team",
+    ],
   },
   {
     number: "02",
@@ -23,6 +36,14 @@ const occasions = [
     text: "Professional menus and seamless service for meetings, launches and gatherings.",
     image:
       "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1400&q=90",
+    details:
+      "Make your corporate gathering memorable with refined menus, professional service and a dining setup designed around your event.",
+    highlights: [
+      "Business lunch & dinner",
+      "Conference catering",
+      "Product launches",
+      "Professional service",
+    ],
   },
   {
     number: "03",
@@ -30,6 +51,14 @@ const occasions = [
     text: "Bring the Atulyam experience home for birthdays, anniversaries and special evenings.",
     image:
       "https://images.unsplash.com/photo-1519671282429-b44660ead0a7?auto=format&fit=crop&w=1400&q=90",
+    details:
+      "Celebrate your special moments with food that feels personal, beautifully presented and prepared around your guests.",
+    highlights: [
+      "Birthday celebrations",
+      "Anniversaries",
+      "Family gatherings",
+      "Custom menus",
+    ],
   },
 ];
 
@@ -89,6 +118,26 @@ const process = [
 ];
 
 export default function CateringPage() {
+  const [selectedOccasion, setSelectedOccasion] = useState(null);
+const navigate = useNavigate();
+  const openOccasion = (occasion) => {
+    setSelectedOccasion(occasion);
+  };
+
+  const closeOccasion = () => {
+    setSelectedOccasion(null);
+  };
+
+  const planEvent = () => {
+    setSelectedOccasion(null);
+
+    setTimeout(() => {
+      document
+        .getElementById("catering-contact")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 100);
+  };
+
   return (
     <div className="bg-black text-white overflow-hidden">
       {/* =====================================================
@@ -121,7 +170,6 @@ export default function CateringPage() {
             transition={{ duration: 0.8, ease }}
             className="flex items-center gap-4 mb-7"
           >
-
             <span className="w-14 h-px bg-[#f28a2e]" />
 
             <span className="text-white/50 text-[10px] uppercase tracking-[0.3em]">
@@ -168,141 +216,102 @@ export default function CateringPage() {
           INTRO
       ===================================================== */}
       <section
-  id="catering-intro"
-  className="relative max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-32"
->
-  <div className="border-t border-white/10 pt-8 md:pt-10">
-
-    {/* TOP META */}
-    <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, ease }}
-      className="flex items-center justify-between mb-14 md:mb-20"
-    >
-      <div className="flex items-center gap-4">
-       
-
-        <span className="w-12 h-px bg-[#f28a2e]" />
-
-        <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
-          Made For Moments
-        </span>
-      </div>
-
-      <span className="hidden md:block text-white/20 text-[9px] uppercase tracking-[0.25em]">
-        Catering · Hospitality · Experience
-      </span>
-    </motion.div>
-
-
-    {/* MAIN CONTENT */}
-    <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-end">
-
-      {/* BIG STATEMENT */}
-      <motion.div
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.9, ease }}
-        className="md:col-span-8"
+        id="catering-intro"
+        className="relative max-w-[1400px] mx-auto px-6 md:px-10 py-24 md:py-32"
       >
-        <p className="text-[#f28a2e] text-[10px] uppercase tracking-[0.3em] mb-6">
-          The Atulyam Experience
-        </p>
+        <div className="border-t border-white/10 pt-8 md:pt-10">
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, ease }}
+            className="flex items-center justify-between mb-14 md:mb-20"
+          >
+            <div className="flex items-center gap-4">
+              <span className="w-12 h-px bg-[#f28a2e]" />
 
-        <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[7vw] leading-[0.84] tracking-[-0.06em]">
-          Great events
-          <br />
-          deserve
-          <br />
-          <span className="italic text-[#f28a2e]">
-            great food.
-          </span>
-        </h2>
-      </motion.div>
+              <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
+                Made For Moments
+              </span>
+            </div>
 
+            <span className="hidden md:block text-white/20 text-[9px] uppercase tracking-[0.25em]">
+              Catering · Hospitality · Experience
+            </span>
+          </motion.div>
 
-      {/* SIDE CONTENT */}
-      <motion.div
-        initial={{ opacity: 0, x: 25 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.15, ease }}
-        className="md:col-span-4 md:pb-2"
-      >
-        <div className="border-l border-[#f28a2e]/50 pl-6 md:pl-8">
+          <div className="grid md:grid-cols-12 gap-12 md:gap-16 items-end">
+            <motion.div
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, ease }}
+              className="md:col-span-8"
+            >
+              <p className="text-[#f28a2e] text-[10px] uppercase tracking-[0.3em] mb-6">
+                The Atulyam Experience
+              </p>
 
-          <p className="font-serif text-xl md:text-2xl leading-8 text-white/85">
-            Thoughtfully prepared food,
-            warm hospitality and a table
-            made for your people.
-          </p>
+              <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[7vw] leading-[0.84] tracking-[-0.06em]">
+                Great events
+                <br />
+                deserve
+                <br />
+                <span className="italic text-[#f28a2e]">
+                  great food.
+                </span>
+              </h2>
+            </motion.div>
 
-          <div className="w-10 h-px bg-[#f28a2e]/60 my-7" />
+            <motion.div
+              initial={{ opacity: 0, x: 25 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.15, ease }}
+              className="md:col-span-4 md:pb-2"
+            >
+              <div className="border-l border-[#f28a2e]/50 pl-6 md:pl-8">
+                <p className="font-serif text-xl md:text-2xl leading-8 text-white/85">
+                  Thoughtfully prepared food, warm hospitality and a table made
+                  for your people.
+                </p>
 
-          <p className="text-white/40 text-sm leading-7 max-w-md">
-            From intimate celebrations to larger gatherings,
-            Atulyam brings the restaurant experience to your
-            special occasion — beautifully prepared and
-            effortlessly served.
-          </p>
+                <div className="w-10 h-px bg-[#f28a2e]/60 my-7" />
 
+                <p className="text-white/40 text-sm leading-7 max-w-md">
+                  From intimate celebrations to larger gatherings, Atulyam
+                  brings the restaurant experience to your special occasion —
+                  beautifully prepared and effortlessly served.
+                </p>
+              </div>
+            </motion.div>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.7, delay: 0.2, ease }}
+            className="mt-16 md:mt-24 pt-6 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6"
+          >
+            {[
+              ["01", "Freshly Prepared"],
+              ["02", "Custom Menus"],
+              ["03", "Warm Service"],
+              ["04", "Memorable Events"],
+            ].map(([number, label]) => (
+              <div key={number}>
+                <span className="block text-[#f28a2e] font-serif text-2xl">
+                  {number}
+                </span>
+                <span className="block mt-2 text-white/30 text-[9px] uppercase tracking-[0.25em]">
+                  {label}
+                </span>
+              </div>
+            ))}
+          </motion.div>
         </div>
-      </motion.div>
-    </div>
-
-
-    {/* BOTTOM DETAILS */}
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.7, delay: 0.2, ease }}
-      className="mt-16 md:mt-24 pt-6 border-t border-white/10 grid grid-cols-2 md:grid-cols-4 gap-6"
-    >
-
-      <div>
-        <span className="block text-[#f28a2e] font-serif text-2xl">
-          01
-        </span>
-        <span className="block mt-2 text-white/30 text-[9px] uppercase tracking-[0.25em]">
-          Freshly Prepared
-        </span>
-      </div>
-
-      <div>
-        <span className="block text-[#f28a2e] font-serif text-2xl">
-          02
-        </span>
-        <span className="block mt-2 text-white/30 text-[9px] uppercase tracking-[0.25em]">
-          Custom Menus
-        </span>
-      </div>
-
-      <div>
-        <span className="block text-[#f28a2e] font-serif text-2xl">
-          03
-        </span>
-        <span className="block mt-2 text-white/30 text-[9px] uppercase tracking-[0.25em]">
-          Warm Service
-        </span>
-      </div>
-
-      <div>
-        <span className="block text-[#f28a2e] font-serif text-2xl">
-          04
-        </span>
-        <span className="block mt-2 text-white/30 text-[9px] uppercase tracking-[0.25em]">
-          Memorable Events
-        </span>
-      </div>
-
-    </motion.div>
-
-  </div>
-</section>
+      </section>
 
       {/* =====================================================
           OCCASIONS
@@ -326,46 +335,63 @@ export default function CateringPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-4">
-            {occasions.map((item, index) => (
-              <motion.div
-                key={item.number}
-                initial={{ opacity: 0, y: 35 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.8,
-                  delay: index * 0.1,
-                  ease,
-                }}
-                className="group relative h-[520px] md:h-[600px] overflow-hidden"
-              >
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
-                />
+           {occasions.map((item, index) => {
+  const occasionSlug = item.title
+    .toLowerCase()
+    .replace(/\s+/g, "-");
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+  return (
+    <motion.div
+      key={item.number}
+      onClick={() => navigate(`/catering/${occasionSlug}`)}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.15 }}
+      transition={{
+        duration: 0.7,
+        delay: index * 0.1,
+      }}
+      className="group relative h-[520px] md:h-[600px] overflow-hidden cursor-pointer"
+    >
+      <img
+        src={item.image}
+        alt={item.title}
+        className="absolute inset-0 w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-105 transition-all duration-700"
+      />
 
-                <div className="relative z-10 h-full flex flex-col justify-between p-6 md:p-8">
-                  <span className="text-[#f28a2e] font-serif italic text-lg">
-                    {item.number}
-                  </span>
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-black/10" />
 
-                  <div>
-                    <h3 className="font-serif text-4xl md:text-5xl tracking-[-0.04em]">
-                      {item.title}
-                    </h3>
+      <div className="absolute inset-0 p-6 md:p-8 flex flex-col justify-between">
 
-                    <p className="mt-4 text-white/60 text-sm leading-6 max-w-sm">
-                      {item.text}
-                    </p>
+        <div className="flex items-start justify-between">
+          <span className="text-[#f28a2e] font-serif italic text-xl">
+            {item.number}
+          </span>
 
-                    <div className="mt-7 w-10 h-px bg-[#f28a2e]" />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+          <span className="w-11 h-11 rounded-full border border-white/20 flex items-center justify-center group-hover:bg-[#f28a2e] group-hover:border-[#f28a2e] group-hover:text-black transition-all duration-500">
+            <ArrowUpRight size={18} />
+          </span>
+        </div>
+
+        <div>
+          <h3 className="font-serif text-3xl md:text-4xl lg:text-5xl">
+            {item.title}
+          </h3>
+
+          <p className="text-white/60 text-sm leading-6 max-w-sm mt-4">
+            {item.text}
+          </p>
+
+          <div className="mt-6 flex items-center gap-3 text-[#f28a2e] text-[9px] uppercase tracking-[0.25em]">
+            <span className="w-8 h-px bg-[#f28a2e]" />
+            Explore
+          </div>
+        </div>
+
+      </div>
+    </motion.div>
+  );
+})}
           </div>
         </div>
       </section>
@@ -373,56 +399,46 @@ export default function CateringPage() {
       {/* =====================================================
           PACKAGES
       ===================================================== */}
-     <section
-  id="catering-packages"
-  className="bg-[#0b0b0b] border-y border-white/10"
->
-  <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-20">
-
-    <div className="grid md:grid-cols-12 gap-8 md:gap-16 items-end mb-12 md:mb-14">
-
-      {/* HEADING */}
-      <motion.div
-        initial={{ opacity: 0, y: 25 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease }}
-        className="md:col-span-7"
+      <section
+        id="catering-packages"
+        className="bg-[#0b0b0b] border-y border-white/10"
       >
-        <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
-          Catering Packages
-        </span>
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-20">
+          <div className="grid md:grid-cols-12 gap-8 md:gap-16 items-end mb-12 md:mb-14">
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease }}
+              className="md:col-span-7"
+            >
+              <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
+                Catering Packages
+              </span>
 
-        <h2 className="font-serif text-5xl md:text-6xl lg:text-[5.5vw] leading-[0.86] tracking-[-0.055em] mt-4">
-          Choose your
-          <br />
-          <span className="italic text-[#f28a2e]">
-            experience.
-          </span>
-        </h2>
-      </motion.div>
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-[5.5vw] leading-[0.86] tracking-[-0.055em] mt-4">
+                Choose your
+                <br />
+                <span className="italic text-[#f28a2e]">experience.</span>
+              </h2>
+            </motion.div>
 
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1, ease }}
+              className="md:col-span-5 md:pb-1"
+            >
+              <div className="border-l border-white/15 pl-6 md:pl-8">
+                <p className="text-white/50 text-sm md:text-[15px] leading-7 max-w-md">
+                  Thoughtfully designed catering options for intimate
+                  gatherings, celebrations and events of every size.
+                </p>
+              </div>
+            </motion.div>
+          </div>
 
-      {/* DESCRIPTION */}
-      <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        whileInView={{ opacity: 1, x: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, delay: 0.1, ease }}
-        className="md:col-span-5 md:pb-1"
-      >
-        <div className="border-l border-white/15 pl-6 md:pl-8">
-          <p className="text-white/50 text-sm md:text-[15px] leading-7 max-w-md">
-            Thoughtfully designed catering options for
-            intimate gatherings, celebrations and events
-            of every size.
-          </p>
-        </div>
-      </motion.div>
-
-    </div>
-
-            
           <div className="grid lg:grid-cols-3 gap-4">
             {packages.map((pkg, index) => (
               <motion.div
@@ -483,13 +499,21 @@ export default function CateringPage() {
                   ))}
                 </div>
 
-                <a
-                  href="#catering-contact"
-                  className="mt-10 flex items-center justify-between border-t border-white/10 pt-5 text-[9px] uppercase tracking-[0.25em] text-white/50 hover:text-white transition-colors"
+                <button
+                  type="button"
+                  onClick={() =>
+                    document
+                      .getElementById("catering-contact")
+                      ?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      })
+                  }
+                  className="mt-10 w-full flex items-center justify-between border-t border-white/10 pt-5 text-[9px] uppercase tracking-[0.25em] text-white/50 hover:text-white transition-colors"
                 >
                   Enquire About This
                   <ArrowUpRight size={15} />
-                </a>
+                </button>
               </motion.div>
             ))}
           </div>
@@ -499,129 +523,107 @@ export default function CateringPage() {
       {/* =====================================================
           PROCESS
       ===================================================== */}
-     <section
-  id="catering-process"
-  className="bg-black border-t border-white/10"
->
-  <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-24">
-
-    {/* HEADER */}
-    <motion.div
-      initial={{ opacity: 0, y: 25 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, ease }}
-      className="grid md:grid-cols-12 gap-8 md:gap-16 items-end mb-14 md:mb-20"
-    >
-      <div className="md:col-span-8">
-
-        <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
-          How It Works
-        </span>
-
-        <h2 className="font-serif text-5xl md:text-6xl lg:text-[6vw] leading-[0.85] tracking-[-0.055em] mt-4">
-          Simple from
-          <br />
-          <span className="italic text-[#f28a2e]">
-            start to finish.
-          </span>
-        </h2>
-
-      </div>
-
-      <div className="md:col-span-4">
-        <p className="text-white/45 text-sm md:text-[15px] leading-7 max-w-md md:ml-auto">
-          Planning your event should feel effortless.
-          We take care of the food, service and details
-          while you enjoy the occasion.
-        </p>
-      </div>
-    </motion.div>
-
-
-    {/* PROCESS STEPS */}
-    <div className="border-t border-white/10">
-
-      {process.map((item, index) => (
-        <motion.div
-          key={item.number}
-          initial={{ opacity: 0, y: 25 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{
-            duration: 0.7,
-            delay: index * 0.12,
-            ease,
-          }}
-          className="group border-b border-white/10 py-8 md:py-10"
-        >
-
-          <div className="grid grid-cols-12 gap-5 md:gap-10 items-center">
-
-            {/* NUMBER */}
-            <div className="col-span-2 md:col-span-2">
-              <span className="font-serif italic text-[#f28a2e] text-2xl md:text-3xl">
-                {item.number}
+      <section
+        id="catering-process"
+        className="bg-black border-t border-white/10"
+      >
+        <div className="max-w-[1400px] mx-auto px-6 md:px-10 py-16 md:py-24">
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease }}
+            className="grid md:grid-cols-12 gap-8 md:gap-16 items-end mb-14 md:mb-20"
+          >
+            <div className="md:col-span-8">
+              <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
+                How It Works
               </span>
+
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-[6vw] leading-[0.85] tracking-[-0.055em] mt-4">
+                Simple from
+                <br />
+                <span className="italic text-[#f28a2e]">
+                  start to finish.
+                </span>
+              </h2>
             </div>
 
-
-            {/* TITLE */}
-            <div className="col-span-8 md:col-span-4">
-              <h3 className="font-serif text-2xl md:text-3xl lg:text-4xl tracking-[-0.035em] group-hover:text-[#f28a2e] transition-colors duration-300">
-                {item.title}
-              </h3>
-            </div>
-
-
-            {/* DESCRIPTION */}
-            <div className="col-span-12 md:col-span-5 md:col-start-8 mt-2 md:mt-0">
-              <p className="text-white/40 text-sm md:text-[15px] leading-7 max-w-lg">
-                {item.text}
+            <div className="md:col-span-4">
+              <p className="text-white/45 text-sm md:text-[15px] leading-7 max-w-md md:ml-auto">
+                Planning your event should feel effortless. We take care of
+                the food, service and details while you enjoy the occasion.
               </p>
             </div>
+          </motion.div>
 
+          <div className="border-t border-white/10">
+            {process.map((item, index) => (
+              <motion.div
+                key={item.number}
+                initial={{ opacity: 0, y: 25 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.7,
+                  delay: index * 0.12,
+                  ease,
+                }}
+                className="group border-b border-white/10 py-8 md:py-10"
+              >
+                <div className="grid grid-cols-12 gap-5 md:gap-10 items-center">
+                  <div className="col-span-2 md:col-span-2">
+                    <span className="font-serif italic text-[#f28a2e] text-2xl md:text-3xl">
+                      {item.number}
+                    </span>
+                  </div>
 
-            {/* ARROW */}
-            <div className="hidden md:flex col-span-1 justify-end">
-              <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#f28a2e] group-hover:bg-[#f28a2e] group-hover:text-black transition-all duration-300">
-                <ArrowUpRight
-                  size={16}
-                  className="group-hover:rotate-45 transition-transform duration-300"
-                />
-              </div>
-            </div>
+                  <div className="col-span-8 md:col-span-4">
+                    <h3 className="font-serif text-2xl md:text-3xl lg:text-4xl tracking-[-0.035em] group-hover:text-[#f28a2e] transition-colors duration-300">
+                      {item.title}
+                    </h3>
+                  </div>
 
+                  <div className="col-span-12 md:col-span-5 md:col-start-8 mt-2 md:mt-0">
+                    <p className="text-white/40 text-sm md:text-[15px] leading-7 max-w-lg">
+                      {item.text}
+                    </p>
+                  </div>
+
+                  <div className="hidden md:flex col-span-1 justify-end">
+                    <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center group-hover:border-[#f28a2e] group-hover:bg-[#f28a2e] group-hover:text-black transition-all duration-300">
+                      <ArrowUpRight
+                        size={16}
+                        className="group-hover:rotate-45 transition-transform duration-300"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
           </div>
 
-        </motion.div>
-      ))}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6"
+          >
+            <span className="text-white/20 text-[9px] uppercase tracking-[0.28em]">
+              From planning to plating
+            </span>
 
-    </div>
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#f28a2e]" />
+              <span className="text-white/25 text-[9px] uppercase tracking-[0.25em]">
+                Atulyam Catering
+              </span>
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-
-    {/* BOTTOM MICRO TEXT */}
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-      className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-6"
-    >
-      <span className="text-white/20 text-[9px] uppercase tracking-[0.28em]">
-        From planning to plating
-      </span>
-
-      <div className="flex items-center gap-3">
-        <span className="w-2 h-2 rounded-full bg-[#f28a2e]" />
-        <span className="text-white/25 text-[9px] uppercase tracking-[0.25em]">
-          Atulyam Catering
-        </span>
-      </div>
-    </motion.div>
-
-  </div>
-</section>
       {/* =====================================================
           CINEMATIC STATEMENT
       ===================================================== */}
@@ -658,13 +660,13 @@ export default function CateringPage() {
               Made to be remembered
             </span>
 
-           <h2 className="font-serif text-5xl md:text-7xl lg:text-[7vw] leading-[0.95] tracking-[-0.055em] mt-6">
-  You bring the
-  <br />
-  <span className="italic text-[#f28a2e]">people.</span>
-  <br />
-  We bring the food.
-</h2>
+            <h2 className="font-serif text-5xl md:text-7xl lg:text-[7vw] leading-[0.95] tracking-[-0.055em] mt-6">
+              You bring the
+              <br />
+              <span className="italic text-[#f28a2e]">people.</span>
+              <br />
+              We bring the food.
+            </h2>
           </motion.div>
         </div>
       </section>
@@ -722,6 +724,161 @@ export default function CateringPage() {
           </div>
         </div>
       </section>
+
+      {/* =====================================================
+          OCCASION MODAL
+      ===================================================== */}
+      <AnimatePresence>
+        {selectedOccasion && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+            onClick={closeOccasion}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 35, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 25, scale: 0.97 }}
+              transition={{ duration: 0.4, ease }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto bg-[#0b0b0b] border border-white/10"
+            >
+              {/* Close */}
+              <button
+                type="button"
+                onClick={closeOccasion}
+                aria-label="Close"
+                className="absolute z-20 top-4 right-4 w-10 h-10 rounded-full border border-white/20 bg-black/60 backdrop-blur-sm flex items-center justify-center hover:bg-[#f28a2e] hover:text-black hover:border-[#f28a2e] transition-all"
+              >
+                <X size={17} />
+              </button>
+
+              <div className="grid md:grid-cols-2">
+                {/* Image */}
+                <div className="relative h-[300px] md:h-[620px]">
+                  <img
+                    src={selectedOccasion.image}
+                    alt={selectedOccasion.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
+
+                  <div className="absolute bottom-6 left-6 md:left-8">
+                    <span className="text-[#f28a2e] font-serif italic text-lg">
+                      {selectedOccasion.number}
+                    </span>
+
+                    <h3 className="font-serif text-4xl md:text-5xl mt-2">
+                      {selectedOccasion.title}
+                    </h3>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-7 md:p-10 lg:p-12 flex flex-col justify-center">
+                  <span className="text-[#f28a2e] text-[9px] uppercase tracking-[0.3em]">
+                    Atulyam Catering
+                  </span>
+
+                  <h4 className="font-serif text-3xl md:text-4xl mt-5 tracking-[-0.04em]">
+                    Made for your{" "}
+                    <span className="italic text-[#f28a2e]">
+                      moment.
+                    </span>
+                  </h4>
+
+                  <p className="text-white/50 text-sm leading-7 mt-6">
+                    {selectedOccasion.details}
+                  </p>
+
+                  <div className="border-t border-white/10 mt-8 pt-7">
+                    <span className="text-white/30 text-[9px] uppercase tracking-[0.25em]">
+                      What's included
+                    </span>
+
+                    <div className="mt-5 space-y-4">
+                      {selectedOccasion.highlights.map((highlight) => (
+                        <div
+                          key={highlight}
+                          className="flex items-center gap-3"
+                        >
+                          <span className="w-7 h-7 rounded-full border border-[#f28a2e]/40 flex items-center justify-center shrink-0">
+                            <Check
+                              size={13}
+                              className="text-[#f28a2e]"
+                            />
+                          </span>
+
+                          <span className="text-sm text-white/65">
+                            {highlight}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 mt-9">
+                    <div className="border border-white/10 p-4">
+                      <Users
+                        size={17}
+                        className="text-[#f28a2e] mb-3"
+                      />
+                      <span className="block text-white/30 text-[8px] uppercase tracking-[0.2em]">
+                        Guest Count
+                      </span>
+                      <span className="block text-white/70 text-sm mt-1">
+                        Flexible
+                      </span>
+                    </div>
+
+                    <div className="border border-white/10 p-4">
+                      <CalendarDays
+                        size={17}
+                        className="text-[#f28a2e] mb-3"
+                      />
+                      <span className="block text-white/30 text-[8px] uppercase tracking-[0.2em]">
+                        Event Type
+                      </span>
+                      <span className="block text-white/70 text-sm mt-1">
+                        {selectedOccasion.title}
+                      </span>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={planEvent}
+                    className="group mt-8 w-full flex items-center justify-between bg-[#f28a2e] text-black px-5 py-4 hover:bg-white transition-colors duration-300"
+                  >
+                    <span className="text-[9px] uppercase tracking-[0.25em]">
+                      Plan This Event
+                    </span>
+
+                    <ArrowUpRight
+                      size={17}
+                      className="group-hover:rotate-45 transition-transform"
+                    />
+                  </button>
+
+                  <a
+                    href="tel:+919451234567"
+                    className="mt-3 w-full flex items-center justify-between border border-white/10 px-5 py-4 text-white/50 hover:text-white hover:border-white/25 transition-colors"
+                  >
+                    <span className="text-[9px] uppercase tracking-[0.25em]">
+                      Call for enquiry
+                    </span>
+
+                    <ArrowUpRight size={16} />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
