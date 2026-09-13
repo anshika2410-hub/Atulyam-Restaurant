@@ -14,9 +14,7 @@ import {
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext.jsx";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
-
+const API_URL = import.meta.env.VITE_API_URL;
 const formatPrice = (value) =>
   `₹${Number(value || 0).toLocaleString("en-IN", {
     minimumFractionDigits: 2,

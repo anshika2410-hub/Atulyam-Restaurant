@@ -10,9 +10,7 @@ const AuthContext = createContext(null);
 const TOKEN_KEY = "atulyam_admin_token";
 const USER_KEY = "atulyam_admin_user";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000/api/v1";
+const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);

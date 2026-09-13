@@ -3,8 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft, CheckCircle2 } from "lucide-react";
 
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000/api/v1";
+  import.meta.env.VITE_API_URL ;
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate();

@@ -11,8 +11,7 @@ const TOKEN_KEY = "atulyam_customer_token";
 const SELECTED_ADDRESS_KEY = "atulyam_selected_address";
 
 const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://127.0.0.1:8000/api/v1";
+  import.meta.env.VITE_API_URL;
 
 export const CustomerAddressProvider = ({ children }) => {
   const [addresses, setAddresses] = useState([]);

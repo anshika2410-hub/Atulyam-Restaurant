@@ -15,7 +15,7 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const API_URL =
-  import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
+  import.meta.env.VITE_API_URL ;
 
 const ease = [0.22, 1, 0.36, 1];
 
