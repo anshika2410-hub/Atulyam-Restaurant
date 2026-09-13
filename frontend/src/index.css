@@ -1,0 +1,96 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #0B0B0C;
+    color: #FDFBF7;
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Luxury Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0B0B0C;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1E1E26;
+    border-radius: 9999px;
+    border: 1px solid rgba(224, 122, 36, 0.25);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #E07A24;
+  }
+}
+
+@layer utilities {
+  /* Editorial typographic accents */
+  .font-editorial {
+    font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  }
+
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  /* Subtle amber atmospheric glows */
+  .bg-radial-luxury {
+    background: radial-gradient(circle at 50% 0%, rgba(224, 122, 36, 0.14) 0%, transparent 65%);
+  }
+
+  .bg-radial-center {
+    background: radial-gradient(circle at 50% 50%, rgba(224, 122, 36, 0.08) 0%, transparent 70%);
+  }
+
+  /* Glassmorphism surfaces */
+  .glass-surface {
+    background: rgba(14, 14, 17, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .glass-card-luxury {
+    background: linear-gradient(180deg, rgba(22, 22, 27, 0.85) 0%, rgba(14, 14, 17, 0.95) 100%);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .glass-card-luxury:hover {
+    border-color: rgba(224, 122, 36, 0.35);
+    box-shadow: 0 12px 35px -10px rgba(224, 122, 36, 0.18);
+  }
+
+  /* Hairline borders */
+  .border-hairline {
+    border-color: rgba(255, 255, 255, 0.07);
+  }
+
+  .border-hairline-amber {
+    border-color: rgba(224, 122, 36, 0.25);
+  }
+
+  /* Shimmer effect for gold/amber text */
+  .text-amber-gradient {
+    background: linear-gradient(135deg, #F59E0B 0%, #E07A24 50%, #F59E0B 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #FDFBF7 0%, #F4EFE6 50%, #C8C2B9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
