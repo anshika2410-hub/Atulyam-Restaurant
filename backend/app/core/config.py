@@ -1,5 +1,5 @@
 import os
-from typing import List, Union
+from typing import List
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -35,12 +35,11 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    @field_validator("ALLOWED_ORIGINS", mode="after")
+    @field_validator("ALLOWED_ORIGINS", mode="before")
     @classmethod
-    def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
+    def assemble_cors_origins(cls, v):
         if isinstance(v, str):
             return [i.strip() for i in v.split(",") if i.strip()]
         return v
-
 
 settings = Settings()
