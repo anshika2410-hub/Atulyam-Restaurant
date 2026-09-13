@@ -28,8 +28,7 @@ class Settings(BaseSettings):
     SQLITE_DEV_FALLBACK: bool = True
 
     # CORS configuration
-    ALLOWED_ORIGINS: Union[str, List[str]] = "http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
-
+    ALLOWED_ORIGINS: Union[str, List[str]] = "https://atulyam-restaurant.vercel.app,http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173"
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), ".env"),
         env_file_encoding="utf-8",
