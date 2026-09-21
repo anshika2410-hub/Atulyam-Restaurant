@@ -197,6 +197,8 @@ export default function ContactPage() {
               <p className="text-white/65 text-sm leading-6 mt-1.5">
                 Atulyam Restaurant
                 <br />
+                1/235 Awas Vikas Colony, Jhunsi
+                <br />
                 Prayagraj, Uttar Pradesh
               </p>
             </div>
@@ -218,10 +220,10 @@ export default function ContactPage() {
               </span>
 
               <a
-                href="tel:+919451234567"
+                href="tel:+919335949448"
                 className="block text-white/65 text-sm mt-1.5 hover:text-[#f28a2e] transition-colors"
               >
-                +91 94512 34567
+                +91 93359 49448
               </a>
             </div>
           </div>
@@ -242,10 +244,10 @@ export default function ContactPage() {
               </span>
 
               <a
-                href="mailto:hello@atulyamhospitality.in"
+                href="mailto:info@atulyamhospitality.in"
                 className="block text-white/65 text-sm mt-1.5 hover:text-[#f28a2e] transition-colors"
               >
-                hello@atulyamhospitality.in
+                info@atulyamhospitality.in
               </a>
             </div>
           </div>
@@ -268,7 +270,7 @@ export default function ContactPage() {
               <p className="text-white/65 text-sm leading-6 mt-1.5">
                 Monday – Sunday
                 <br />
-                11:00 AM – 11:00 PM
+                07:00 AM – 01:00 AM
               </p>
             </div>
           </div>
@@ -285,7 +287,7 @@ export default function ContactPage() {
 
             {/* INSTAGRAM */}
             <a
-              href="#"
+              href="https://www.instagram.com/atulyam_restaurant/"
               className="inline-flex items-center gap-3 text-white/35 hover:text-[#f28a2e] transition-colors"
             >
               <Instagram size={16} />
@@ -298,7 +300,7 @@ export default function ContactPage() {
 
             {/* MAP BUTTON */}
             <a
-              href="https://www.google.com/maps/search/?api=1&query=Atulyam+Restaurant+Prayagraj"
+              href="https://www.google.com/maps/dir//Atulyam+Restaurant,+Milan+chauraha,+Jhusi,+Prayagraj,+Uttar+Pradesh+211019/@25.4286636,81.9207415,15z/data=!3m1!4b1!4m8!4m7!1m0!1m5!1m1!1s0x39854b1fe99a735d:0x8f4486ba30b94331!2m2!1d81.9133338!2d25.4262001?hl=en-US&authuser=1&entry=ttu&g_ep=EgoyMDI2MDkwOS4wIKXMDSoASAFQAw%3D%3D"
               target="_blank"
               rel="noopener noreferrer"
               className="group inline-flex items-center justify-center gap-4 border border-white/15 px-5 py-3 text-white/60 hover:border-[#f28a2e] hover:text-[#f28a2e] transition-all duration-300"

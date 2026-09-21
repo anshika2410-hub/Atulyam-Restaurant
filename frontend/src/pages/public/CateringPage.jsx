@@ -701,7 +701,7 @@ const navigate = useNavigate();
               </p>
 
               <a
-                href="tel:+919451234567"
+                href="tel:+919871435739"
                 className="group mt-8 inline-flex items-center justify-between border border-white/15 hover:border-[#f28a2e]/60 px-5 py-4 max-w-md transition-all duration-300"
               >
                 <span className="text-[10px] uppercase tracking-[0.25em]">
@@ -864,7 +864,7 @@ const navigate = useNavigate();
                   </button>
 
                   <a
-                    href="tel:+919451234567"
+                    href="tel:+919871435739"
                     className="mt-3 w-full flex items-center justify-between border border-white/10 px-5 py-4 text-white/50 hover:text-white hover:border-white/25 transition-colors"
                   >
                     <span className="text-[9px] uppercase tracking-[0.25em]">

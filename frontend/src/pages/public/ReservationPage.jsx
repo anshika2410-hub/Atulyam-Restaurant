@@ -13,11 +13,14 @@ const ease = [0.22, 1, 0.36, 1];
 
 const ReservationPage = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [guests, setGuests] = useState("");
+const [guestCount, setGuestCount] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSubmitted(true);
   };
+  
 
   return (
     <main className="bg-black text-white min-h-screen">
@@ -135,7 +138,7 @@ const ReservationPage = () => {
                     <p className="text-white/35 text-xs mt-2 leading-6">
                       Monday – Sunday
                       <br />
-                      11:00 AM – 11:00 PM
+                      07:00 AM – 01:00 AM
                     </p>
 
                   </div>
@@ -158,10 +161,10 @@ const ReservationPage = () => {
                     </p>
 
                     <a
-                      href="tel:+919451234567"
+                      href="tel:+919335949448"
                       className="text-white/35 text-xs mt-2 block hover:text-[#f28a2e] transition-colors"
                     >
-                      +91 94512 34567
+                      +91 93359 49448
                     </a>
 
                   </div>
@@ -361,49 +364,69 @@ const ReservationPage = () => {
 
 
                     {/* =================================================
-                        GUESTS
-                    ================================================= */}
-                    <div>
+    GUESTS
+================================================= */}
+<div>
 
-                      <label className="flex items-center gap-2 text-white/35 text-[9px] uppercase tracking-[0.25em] mb-3">
-                        <Users size={13} />
-                        Number of Guests
-                      </label>
+  <label className="flex items-center gap-2 text-white/35 text-[9px] uppercase tracking-[0.25em] mb-3">
+    <Users size={13} />
+    Number of Guests
+  </label>
 
-                      <select
-                        required
-                        defaultValue=""
-                        className="w-full bg-transparent border-b border-white/15 py-3 text-sm text-white outline-none focus:border-[#f28a2e] transition-colors"
-                      >
+  <select
+    required
+    value={guests}
+    onChange={(e) => {
+      setGuests(e.target.value);
 
-                        <option
-                          value=""
-                          disabled
-                          className="bg-black"
-                        >
-                          Select guests
-                        </option>
+      // Clear custom count if user changes back from 9+
+      if (e.target.value !== "9+") {
+        setGuestCount("");
+      }
+    }}
+    className="w-full bg-transparent border-b border-white/15 py-3 text-sm text-white outline-none focus:border-[#f28a2e] transition-colors"
+  >
 
-                        {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+    <option value="" disabled className="bg-black">
+      Select guests
+    </option>
 
-                          <option
-                            key={num}
-                            className="bg-black"
-                          >
-                            {num} {num === 1 ? "Guest" : "Guests"}
-                          </option>
+    {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
+      <option
+        key={num}
+        value={`${num} ${num === 1 ? "Guest" : "Guests"}`}
+        className="bg-black"
+      >
+        {num} {num === 1 ? "Guest" : "Guests"}
+      </option>
+    ))}
 
-                        ))}
+    <option value="9+" className="bg-black">
+      9+ Guests
+    </option>
 
-                        <option className="bg-black">
-                          9+ Guests
-                        </option>
+  </select>
 
-                      </select>
+  {/* CUSTOM GUEST COUNT */}
+  {guests === "9+" && (
+    <motion.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: "auto" }}
+      className="mt-4"
+    >
+      <input
+        type="number"
+        min="9"
+        required
+        value={guestCount}
+        onChange={(e) => setGuestCount(e.target.value)}
+        placeholder="Please specify number of guests"
+        className="w-full bg-transparent border-b border-white/15 py-3 text-sm text-white placeholder:text-white/20 outline-none focus:border-[#f28a2e] transition-colors"
+      />
+    </motion.div>
+  )}
 
-                    </div>
-
-
+</div>
                     {/* =================================================
                         SPECIAL REQUEST
                     ================================================= */}

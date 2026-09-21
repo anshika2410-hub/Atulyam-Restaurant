@@ -212,25 +212,16 @@ export const Navbar = () => {
               LOGO
           ================================================= */}
 
-          <Link
-            to="/"
-            className="flex items-center gap-2 sm:gap-3.5 group select-none min-w-0 shrink"
-          >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full border border-brand-500/40 bg-dark-850 flex items-center justify-center shrink-0 group-hover:border-brand-400 group-hover:scale-105 transition-all duration-300 shadow-[0_0_15px_rgba(224,122,36,0.2)]">
-              <UtensilsCrossed className="w-4 h-4 text-brand-500" />
-            </div>
-
-            <div className="flex flex-col min-w-0">
-              <span className="font-serif text-[20px] sm:text-2xl xl:text-[26px] tracking-[0.16em] sm:tracking-[0.2em] uppercase text-ivory-100 font-normal leading-none">
-                Atulyam
-              </span>
-
-              <span className="text-[7px] sm:text-[9px] uppercase tracking-[0.18em] sm:tracking-widest-xl text-brand-400 font-medium mt-1 whitespace-nowrap">
-                Haute Indian Cuisine
-              </span>
-            </div>
-          </Link>
-
+<Link
+  to="/"
+  className="flex items-center group select-none shrink-0"
+>
+  <img
+    src="/images/logo.png"
+    alt="Atulyam Restaurant"
+    className="w-[170px] sm:w-[195px] lg:w-[220px] h-auto object-contain mix-blend-screen transition-transform duration-300 group-hover:scale-[1.02]"
+  />
+</Link>
           {/* =================================================
               DESKTOP NAV
           ================================================= */}
@@ -280,13 +271,13 @@ export const Navbar = () => {
             =============================================== */}
 
             <a
-              href="tel:+919876543210"
+              href="tel:+919335949448"
               className="hidden xl:inline-flex items-center gap-2 px-2 py-2 text-[10px] uppercase tracking-[0.14em] text-ivory-400 hover:text-brand-400 transition-colors whitespace-nowrap"
             >
               <Phone className="w-3.5 h-3.5 text-brand-500" />
 
               <span>
-                +91 98765 43210
+                +91 9335949448
               </span>
             </a>
 
@@ -664,13 +655,13 @@ export const Navbar = () => {
 
               <div className="pt-3 mt-2 border-t border-white/[0.06]">
                 <a
-                  href="tel:+919876543210"
+                  href="tel:+919335949448"
                   className="flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.18em] text-ivory-600 hover:text-brand-400 py-2.5 transition"
                 >
                   <Phone className="w-3.5 h-3.5 text-brand-500" />
 
                   <span>
-                    +91 98765 43210
+                    +91 9335949448
                   </span>
                 </a>
               </div>

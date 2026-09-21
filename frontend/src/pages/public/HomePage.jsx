@@ -10,11 +10,9 @@ import {
 } from 'lucide-react';
 
 const SLIDE_DURATION = 4000;
-
 const slides = [
   {
-    image:
-      'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=2200&q=90',
+    image: '/images/menu/atulyam-special-tikka.jpeg',
     eyebrow: 'ATULYAM RESTAURANT',
     title: 'Where every meal',
     accent: 'becomes a memory.',
@@ -23,7 +21,7 @@ const slides = [
   },
   {
     image:
-      'https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&w=2200&q=90',
+      '/images/menu/margherita-pizza.jpeg',
     eyebrow: 'THE ART OF INDIAN FLAVOUR',
     title: 'Tradition,',
     accent: 'served beautifully.',
@@ -32,7 +30,7 @@ const slides = [
   },
   {
     image:
-      'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=2200&q=90',
+      '/images/menu/cheese-corn-nuggets.jpeg',
     eyebrow: 'MADE FOR GATHERING',
     title: 'Good food.',
     accent: 'Better company.',
@@ -41,7 +39,7 @@ const slides = [
   },
   {
     image:
-      'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&w=2200&q=90',
+      '/images/menu/veg-momos.jpeg',
     eyebrow: 'A TASTE OF ATULYAM',
     title: 'Flavours that',
     accent: 'bring people closer.',
@@ -115,7 +113,7 @@ export default function HomePage() {
 
 <section className="relative h-[92vh] min-h-[680px] w-full overflow-hidden">
 
-  <AnimatePresence initial={false} mode="sync">
+  <AnimatePresence initial={true} mode="sync">
     <motion.div
       key={active}
       className="absolute inset-0"
@@ -130,16 +128,17 @@ export default function HomePage() {
 
       {/* CINEMATIC IMAGE ZOOM */}
       <motion.img
-        key={`hero-image-${active}`}
-        src={slides[active].image}
-        alt="Atulyam restaurant"
-        className="absolute inset-0 h-full w-full object-cover"
-        initial={{ scale: 1 }}
-        animate={{ scale: 1.09 }}
-        transition={{
-          duration: SLIDE_DURATION / 1000,
-          ease: 'linear',
-        }}
+  key={`hero-image-${active}`}
+  src={slides[active].image}
+  alt="Atulyam restaurant"
+  className="absolute inset-0 h-full w-full object-cover"
+  initial={{ scale: 1 }}
+  animate={{ scale: 1.09 }}
+  transition={{
+    duration: SLIDE_DURATION / 1000,
+    ease: 'linear',
+  }}
+
       />
 
       {/* DARK OVERLAYS */}

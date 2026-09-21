@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1 import api_router
 from app.db.seed import init_and_seed_db
-
+from app.api.v1.admin_customers import router as admin_customers_router
 from fastapi.staticfiles import StaticFiles
 
 @asynccontextmanager
@@ -44,7 +44,10 @@ app.add_middleware(
 
 # Mount API routers
 app.include_router(api_router, prefix=settings.API_V1_STR)
-
+app.include_router(
+    admin_customers_router,
+    prefix=settings.API_V1_STR,
+)
 
 @app.get("/", tags=["Root"])
 def root():

@@ -52,23 +52,16 @@ export const Footer = () => {
   transition={{ duration: 0.6, ease }}
 >
 
-              <Link
-                to="/"
-                className="inline-flex items-center gap-3 group"
-              >
-
-                <div className="w-10 h-10 border border-white/15 flex items-center justify-center group-hover:border-[#f28a2e] transition-colors duration-300">
-                  <span className="font-serif italic text-[#f28a2e] text-lg">
-                    A
-                  </span>
-                </div>
-
-                <span className="font-serif text-xl tracking-[0.18em] uppercase">
-                  Atulyam
-                </span>
-
-              </Link>
-
+             <Link
+               to="/"
+               className="flex items-center group select-none shrink-0"
+             >
+               <img
+                 src="/images/logo.png"
+                 alt="Atulyam Restaurant"
+                 className="w-[170px] sm:w-[195px] lg:w-[220px] h-auto object-contain mix-blend-screen transition-transform duration-300 group-hover:scale-[1.02]"
+               />
+             </Link>
               <p className="text-white/35 text-xs leading-6 mt-5 max-w-[220px]">
                 Incomparable taste in every bite.
               </p>
@@ -151,6 +144,8 @@ export const Footer = () => {
                   <p className="text-white/55 text-xs leading-6">
                     Atulyam Restaurant
                     <br />
+                    1/235 Awas Vikas Colony, Jhunsi
+                     <br />
                     Prayagraj, Uttar Pradesh
                   </p>
 
@@ -168,7 +163,7 @@ export const Footer = () => {
                   <p className="text-white/55 text-xs leading-6">
                     Monday – Sunday
                     <br />
-                    11:00 AM – 11:00 PM
+                    07:00 AM – 01:00 AM
                   </p>
 
                 </div>
@@ -196,17 +191,17 @@ export const Footer = () => {
 
                 {/* PHONE */}
                 <a
-                  href="tel:+919451234567"
+                  href="tel:+919335949448"
                   className="flex items-center gap-3 text-white/55 hover:text-[#f28a2e] text-xs transition-colors"
                 >
                   <Phone size={15} className="shrink-0" />
-                  <span>+91 94512 34567</span>
+                  <span>+91 9335949448 </span>
                 </a>
 
 
                 {/* EMAIL */}
                 <a
-                  href="mailto:hello@atulyamhospitality.in"
+                  href="mailto:info@atulyamhospitality.in"
                   className="flex items-start gap-3 text-white/55 hover:text-[#f28a2e] text-xs transition-colors"
                 >
                   <Mail
@@ -215,7 +210,7 @@ export const Footer = () => {
                   />
 
                   <span className="break-all">
-                    hello@atulyamhospitality.in
+                    info@atulyamhospitality.in
                   </span>
                 </a>
 
@@ -223,14 +218,15 @@ export const Footer = () => {
                 {/* SOCIALS */}
                 <div className="flex items-center gap-2 pt-2">
 
-                  <a
-                    href="#"
-                    aria-label="Instagram"
-                    className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:text-[#f28a2e] hover:border-[#f28a2e] transition-all duration-300"
-                  >
-                    <Instagram size={15} />
-                  </a>
-
+                <a
+  href="https://www.instagram.com/atulyam_restaurant/"
+  target="_blank"
+  rel="noopener noreferrer"
+  aria-label="Instagram"
+  className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:text-[#f28a2e] hover:border-[#f28a2e] transition-all duration-300"
+>
+  <Instagram size={15} />
+</a>
                   <a
                     href="#"
                     aria-label="Facebook"
@@ -252,50 +248,138 @@ export const Footer = () => {
 {/* =================================================
     BOTTOM BAR
 ================================================= */}
-<div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+<div className="pt-6 mt-0 border-t border-white/[0.06]">
 
-  {/* COPYRIGHT */}
-  <p className="text-white/20 text-[9px] uppercase tracking-[0.18em] text-center sm:text-left">
+  {/* MOBILE */}
+  <div className="flex flex-col sm:hidden gap-5">
+
+    {/* COPYRIGHT */}
+    <p className="text-white/20 text-[8px] uppercase tracking-[0.14em] text-center">
+      © {new Date().getFullYear()} Atulyam. All rights reserved.
+    </p>
+
+    {/* LINKS + TOP */}
+    <div className="flex items-center justify-center gap-4">
+
+      <Link
+        to="/reservation"
+        className="text-white/30 hover:text-white text-[8px] uppercase tracking-[0.14em] transition-colors"
+      >
+        Reservations
+      </Link>
+
+      <span className="w-1 h-1 rounded-full bg-white/15" />
+
+      <Link
+        to="/admin/login"
+        className="text-white/30 hover:text-[#f28a2e] text-[8px] uppercase tracking-[0.14em] transition-colors"
+      >
+        Admin
+      </Link>
+
+      <span className="w-1 h-1 rounded-full bg-white/15" />
+
+      <button
+        type="button"
+        onClick={() =>
+          window.scrollTo({
+            top: 0,
+            behavior: "smooth",
+          })
+        }
+        aria-label="Back to top"
+        className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center text-[#f28a2e]"
+      >
+        <ArrowUp size={13} strokeWidth={1.5} />
+      </button>
+
+    </div>
+
+    {/* DESIGNED BY */}
+    <p className="text-center text-white/15 text-[8px] uppercase tracking-[0.13em]">
+      Designed by{" "}
+      <a
+        href="https://www.instagram.com/anshikaagr.webdev/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-white/30 hover:text-[#f28a2e] transition-colors"
+      >
+        anshikaagr.webdev
+      </a>
+    </p>
+
+  </div>
+
+
+ {/* DESKTOP */}
+<div className="hidden sm:flex items-center justify-between">
+
+  {/* COPYRIGHT — LEFT */}
+  <p className="text-white/20 text-[9px] uppercase tracking-[0.18em]">
     © {new Date().getFullYear()} Atulyam. All rights reserved.
   </p>
 
-  {/* RIGHT LINKS */}
+  {/* RIGHT SIDE */}
   <div className="flex items-center gap-5">
 
     <Link
-  to="/reservation"
-  className="text-white/20 hover:text-white/50 text-[9px] uppercase tracking-[0.18em] transition-colors"
->
-  Reservations
-</Link>
+      to="/reservation"
+      className="text-white/20 hover:text-white/60 text-[9px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap"
+    >
+      Reservations
+    </Link>
 
-    <span className="w-1 h-1 rounded-full bg-white/15" />
+    <span className="w-1 h-1 rounded-full bg-white/15 shrink-0" />
 
     <Link
       to="/admin/login"
-      className="text-white/20 hover:text-[#f28a2e] text-[9px] uppercase tracking-[0.18em] transition-colors"
+      className="text-white/20 hover:text-[#f28a2e] text-[9px] uppercase tracking-[0.18em] transition-colors whitespace-nowrap"
     >
       Admin
     </Link>
 
-    <span className="w-1 h-1 rounded-full bg-white/15" />
+    <span className="w-1 h-1 rounded-full bg-white/15 shrink-0" />
 
-  <span className="text-white/20 text-[9px] uppercase tracking-[0.18em]">
-  Designed by{' '}
-  <a
-    href="https://www.instagram.com/anshikaagr.webdev/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="text-white/40 hover:text-[#f28a2e] transition-colors"
-  >
-    anshikaagr.webdev
-  </a>
-</span>
-{/* BACK TO TOP */} <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth', }) } aria-label="Back to top" title="Back to Top" className="group ml-1 w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-[#f28a2e] hover:border-[#f28a2e] hover:bg-[#f28a2e]/5 transition-all duration-300" > <ArrowUp size={15} strokeWidth={1.5} className="transition-transform duration-300 group-hover:-translate-y-1" /> </button>
+    <span className="text-white/20 text-[9px] uppercase tracking-[0.18em] whitespace-nowrap">
+      Designed by{" "}
+      <a
+        href="https://www.instagram.com/anshikaagr.webdev/"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-white/35 hover:text-[#f28a2e] transition-colors"
+      >
+        anshikaagr.webdev
+      </a>
+    </span>
+
+    {/* BACK TO TOP */}
+    <button
+      type="button"
+      onClick={() =>
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        })
+      }
+      aria-label="Back to top"
+      title="Back to Top"
+      className="group ml-1 w-9 h-9 rounded-full border border-white/10 flex items-center justify-center text-[#f28a2e] hover:border-[#f28a2e] hover:bg-[#f28a2e]/5 transition-all duration-300 shrink-0"
+    >
+      <ArrowUp
+        size={14}
+        strokeWidth={1.5}
+        className="transition-transform duration-300 group-hover:-translate-y-1"
+      />
+    </button>
+
   </div>
 
 </div>
-      </div>
+
+  </div>
+
+
+</div>
 
     </footer>
   );

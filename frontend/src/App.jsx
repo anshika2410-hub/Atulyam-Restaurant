@@ -28,7 +28,7 @@ import OrderConfirmationPage from "./pages/public/OrderConfirmationPage.jsx";
 import OrderTrackingPage from "./pages/public/OrderTrackingPage.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerLoginPage from "./pages/public/CustomerLoginPage.jsx";
-
+import AdminCustomersPage from "./pages/admin/CustomersPage.jsx";
 import {
   CustomerAuthProvider,
   useCustomerAuth,
@@ -389,6 +389,17 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
+
+<Route
+  path="/admin/customers"
+  element={
+    <ProtectedRoute>
+      <PageTransition>
+        <AdminCustomersPage />
+      </PageTransition>
+    </ProtectedRoute>
+  }
+/>
 
 <Route
   path="/admin/menu"

@@ -239,11 +239,9 @@ const OrderOnlinePage = () => {
             className="grid md:grid-cols-12 gap-8 md:gap-16 items-end mb-12 md:mb-16"
           >
             <div className="md:col-span-7">
-              <span className="text-white/35 text-[9px] uppercase tracking-[0.3em]">
-                Explore The Menu
-              </span>
+              
 
-              <h2 className="font-serif text-5xl md:text-6xl lg:text-[5.5vw] leading-[0.86] tracking-[-0.055em] mt-4">
+              <h2 className="font-serif text-5xl md:text-6xl lg:text-[5.5vw] leading-[0.86] tracking-[-0.055em] mt-8">
                 Pick your
                 <br />
                 <span className="italic text-[#f28a2e]">
