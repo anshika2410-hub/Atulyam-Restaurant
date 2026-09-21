@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowDown,
@@ -136,51 +136,12 @@ const imageReveal = {
 /* -------------------------------------------------------------------------- */
 /*                                MENU ITEM                                   */
 /* -------------------------------------------------------------------------- */
+
 function MenuItem({ item, index, onClick }) {
-  const itemRef = useRef(null);
-
-  useEffect(() => {
-    const element = itemRef.current;
-    if (!element || !item.image) return;
-
-    const preload = () => {
-      const img = new Image();
-      img.src = item.image;
-    };
-
-    // Load image when the menu item comes near the viewport
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          preload();
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: "300px",
-      }
-    );
-
-    observer.observe(element);
-
-    return () => observer.disconnect();
-  }, [item.image]);
-
-  const handleClick = () => {
-    // Start loading immediately as an extra safety measure
-    if (item.image) {
-      const img = new Image();
-      img.src = item.image;
-    }
-
-    onClick();
-  };
-
   return (
     <motion.button
-      ref={itemRef}
       type="button"
-      onClick={handleClick}
+      onClick={onClick}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{
@@ -248,12 +209,12 @@ function MenuItem({ item, index, onClick }) {
     </motion.button>
   );
 }
+
 /* -------------------------------------------------------------------------- */
 /*                                MAIN PAGE                                   */
 /* -------------------------------------------------------------------------- */
 
 export default function MenuPage() {
-  const [categoryData, setCategoryData] = useState([]);
   const [menuItems, setMenuItems] = useState([]);
 
   const [loading, setLoading] = useState(true);
@@ -274,27 +235,15 @@ export default function MenuPage() {
         setLoading(true);
         setError("");
 
-        const [categoriesRes, menuRes] = await Promise.all([
-          fetch(`${API_URL}/categories?active_only=true`),
-          fetch(`${API_URL}/menu?available_only=true`),
-        ]);
-
-        if (!categoriesRes.ok) {
-          throw new Error("Failed to load categories.");
-        }
+        const menuRes = await fetch(
+          `${API_URL}/menu?available_only=true`
+        );
 
         if (!menuRes.ok) {
           throw new Error("Failed to load menu.");
         }
 
-        const categoriesData = await categoriesRes.json();
         const menuData = await menuRes.json();
-
-        setCategoryData(
-          Array.isArray(categoriesData)
-            ? categoriesData
-            : categoriesData.items || []
-        );
 
         setMenuItems(
           Array.isArray(menuData)
@@ -317,6 +266,27 @@ export default function MenuPage() {
   }, []);
 
   /* ------------------------------------------------------------------------ */
+  /*                         CATEGORY DATA FROM MENU                          */
+  /* ------------------------------------------------------------------------ */
+
+  const categoryData = useMemo(() => {
+    const categories = Object.keys(categoryImages).filter(
+      (category) => category !== "All"
+    );
+
+    return categories.map((name, index) => ({
+      id: name,
+      name,
+      slug: name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-"),
+      description: "",
+      image: categoryImages[name],
+      index,
+    }));
+  }, []);
+
+  /* ------------------------------------------------------------------------ */
   /*                            GROUP MENU ITEMS                              */
   /* ------------------------------------------------------------------------ */
 
@@ -325,17 +295,24 @@ export default function MenuPage() {
 
     return categoryData
       .map((category) => {
-        /*
-         * IMPORTANT:
-         * Number() makes this work whether API sends:
-         * category_id: 5
-         * or
-         * category_id: "5"
-         */
-        let items = menuItems.filter(
-          (item) =>
-            Number(item.category_id) === Number(category.id)
-        );
+        let items = menuItems.filter((item) => {
+          const itemCategoryName =
+            item.category?.name ||
+            item.category_name ||
+            item.categoryName ||
+            item.category;
+
+          if (itemCategoryName) {
+            return (
+              String(itemCategoryName)
+                .trim()
+                .toLowerCase() ===
+              category.name.trim().toLowerCase()
+            );
+          }
+
+          return false;
+        });
 
         /* SEARCH */
         if (query) {
@@ -360,10 +337,7 @@ export default function MenuPage() {
           category: category.name,
           slug: category.slug,
           description: category.description,
-
-          image:
-            categoryImages[category.name] ||
-            categoryImages.All,
+          image: category.image,
 
           items: items.map((item) => ({
             id: item.id,
@@ -380,8 +354,7 @@ export default function MenuPage() {
 
             image:
               item.image_url ||
-              categoryImages[category.name] ||
-              categoryImages.All,
+              category.image,
 
             tag: item.is_featured
               ? "Chef's Pick"
@@ -393,10 +366,6 @@ export default function MenuPage() {
           })),
         };
       })
-      /*
-       * When searching, don't show all the categories
-       * that have zero matching dishes.
-       */
       .filter((section) => {
         if (!query) {
           return true;
@@ -407,7 +376,7 @@ export default function MenuPage() {
   }, [categoryData, menuItems, search]);
 
   /* ------------------------------------------------------------------------ */
-  /*                             FILTER CATEGORY                             */
+  /*                             FILTER CATEGORY                              */
   /* ------------------------------------------------------------------------ */
 
   const visibleSections = useMemo(() => {
@@ -423,7 +392,7 @@ export default function MenuPage() {
   }, [groupedMenu, activeCategory]);
 
   /* ------------------------------------------------------------------------ */
-  /*                              CATEGORY LIST                              */
+  /*                              CATEGORY LIST                               */
   /* ------------------------------------------------------------------------ */
 
   const categories = useMemo(() => {
@@ -433,11 +402,6 @@ export default function MenuPage() {
         name: "All",
       },
       ...categoryData
-        /*
-         * Extra safety:
-         * if old "Chinese" category is still accidentally active
-         * in backend, frontend won't show it.
-         */
         .filter(
           (category) =>
             category.name?.toLowerCase() !== "chinese"
@@ -450,7 +414,7 @@ export default function MenuPage() {
   }, [categoryData]);
 
   /* ------------------------------------------------------------------------ */
-  /*                               SCROLL TO                                 */
+  /*                               SCROLL TO                                  */
   /* ------------------------------------------------------------------------ */
 
   const scrollToCategory = (categoryName) => {
@@ -497,7 +461,7 @@ export default function MenuPage() {
   };
 
   /* ------------------------------------------------------------------------ */
-  /*                                  LOADING                                */
+  /*                                  LOADING                                 */
   /* ------------------------------------------------------------------------ */
 
   if (loading) {
@@ -517,7 +481,7 @@ export default function MenuPage() {
   }
 
   /* ------------------------------------------------------------------------ */
-  /*                                   ERROR                                 */
+  /*                                   ERROR                                  */
   /* ------------------------------------------------------------------------ */
 
   if (error) {
@@ -551,7 +515,7 @@ export default function MenuPage() {
   }
 
   /* ------------------------------------------------------------------------ */
-  /*                                   PAGE                                  */
+  /*                                   PAGE                                   */
   /* ------------------------------------------------------------------------ */
 
   return (
