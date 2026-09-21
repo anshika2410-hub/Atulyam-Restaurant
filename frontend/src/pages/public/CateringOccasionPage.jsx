@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft,
+  ArrowRight,
   ArrowUpRight,
   Image as ImageIcon,
   Play,
   Phone,
+  X,
 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -44,6 +46,9 @@ export default function CateringOccasionPage() {
   const [mediaItems, setMediaItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // LIGHTBOX
+  const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
     const fetchMedia = async () => {
@@ -91,6 +96,72 @@ export default function CateringOccasionPage() {
 
     return `${BACKEND_URL}${url}`;
   };
+
+  // =====================================================
+  // LIGHTBOX FUNCTIONS
+  // =====================================================
+
+  const openLightbox = (index) => {
+    setLightboxIndex(index);
+  };
+
+  const closeLightbox = () => {
+    setLightboxIndex(null);
+  };
+
+  const showPrevious = () => {
+    setLightboxIndex((current) => {
+      if (current === null || occasionMedia.length === 0) {
+        return current;
+      }
+
+      return current === 0
+        ? occasionMedia.length - 1
+        : current - 1;
+    });
+  };
+
+  const showNext = () => {
+    setLightboxIndex((current) => {
+      if (current === null || occasionMedia.length === 0) {
+        return current;
+      }
+
+      return current === occasionMedia.length - 1
+        ? 0
+        : current + 1;
+    });
+  };
+
+  // Keyboard controls
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeLightbox();
+      }
+
+      if (event.key === "ArrowLeft") {
+        showPrevious();
+      }
+
+      if (event.key === "ArrowRight") {
+        showNext();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [lightboxIndex, occasionMedia.length]);
+
+  const activeMedia =
+    lightboxIndex !== null
+      ? occasionMedia[lightboxIndex]
+      : null;
 
   if (!occasionData) {
     return (
@@ -215,7 +286,16 @@ export default function CateringOccasionPage() {
               className="relative"
             >
 
-              <div className="relative aspect-[16/10] overflow-hidden bg-[#0d0d0d]">
+              <div
+                className={`relative aspect-[16/10] overflow-hidden bg-[#0d0d0d] ${
+                  featuredMedia ? "cursor-pointer group" : ""
+                }`}
+                onClick={() => {
+                  if (featuredMedia) {
+                    openLightbox(0);
+                  }
+                }}
+              >
 
                 {featuredMedia ? (
                   featuredMedia.media_type === "video" ? (
@@ -230,7 +310,7 @@ export default function CateringOccasionPage() {
                     <img
                       src={getMediaUrl(featuredMedia.media_url)}
                       alt={featuredMedia.title || occasionData.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                     />
                   )
                 ) : (
@@ -244,6 +324,18 @@ export default function CateringOccasionPage() {
 
                 {/* Orange corner */}
                 <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-[#f28a2e]/60 pointer-events-none" />
+
+                {/* Open indicator */}
+                {featuredMedia && (
+                  <div className="absolute top-5 right-5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="w-10 h-10 flex items-center justify-center bg-black/60 backdrop-blur-md border border-white/15">
+                      <ArrowUpRight
+                        size={16}
+                        className="text-white"
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Label */}
                 {featuredMedia && (
@@ -400,7 +492,8 @@ export default function CateringOccasionPage() {
                       duration: 0.55,
                       delay: index * 0.06,
                     }}
-                    className="group"
+                    className="group cursor-pointer"
+                    onClick={() => openLightbox(index + 1)}
                   >
 
                     {/* Media */}
@@ -445,6 +538,14 @@ export default function CateringOccasionPage() {
                           </>
                         )}
                       </span>
+
+                      {/* Open icon */}
+                      <div className="absolute right-4 bottom-4 w-9 h-9 flex items-center justify-center bg-black/55 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none">
+                        <ArrowUpRight
+                          size={15}
+                          className="text-white"
+                        />
+                      </div>
 
                     </div>
 
@@ -602,6 +703,126 @@ export default function CateringOccasionPage() {
         </div>
 
       </section>
+
+
+      {/* =====================================================
+          FULLSCREEN MEDIA LIGHTBOX
+      ===================================================== */}
+
+      <AnimatePresence>
+        {activeMedia && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+            onClick={closeLightbox}
+          >
+
+            {/* CLOSE */}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                closeLightbox();
+              }}
+              className="absolute top-5 right-5 md:top-8 md:right-8 z-30 w-11 h-11 flex items-center justify-center border border-white/15 bg-black/60 text-white/70 hover:text-white hover:border-[#f28a2e] transition-all"
+            >
+              <X size={20} strokeWidth={1.3} />
+            </button>
+
+
+            {/* PREVIOUS */}
+            {occasionMedia.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showPrevious();
+                }}
+                className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center border border-white/15 bg-black/60 text-white/70 hover:text-white hover:border-[#f28a2e] transition-all"
+              >
+                <ArrowLeft size={20} strokeWidth={1.2} />
+              </button>
+            )}
+
+
+            {/* NEXT */}
+            {occasionMedia.length > 1 && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  showNext();
+                }}
+                className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-30 w-11 h-11 md:w-12 md:h-12 flex items-center justify-center border border-white/15 bg-black/60 text-white/70 hover:text-white hover:border-[#f28a2e] transition-all"
+              >
+                <ArrowRight size={20} strokeWidth={1.2} />
+              </button>
+            )}
+
+
+            {/* MEDIA */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.3 }}
+              className="relative max-w-[88vw] max-h-[86vh] flex items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+
+              {activeMedia.media_type === "video" ? (
+                <video
+                  key={activeMedia.id}
+                  src={getMediaUrl(activeMedia.media_url)}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-w-[88vw] max-h-[80vh] object-contain"
+                />
+              ) : (
+                <img
+                  key={activeMedia.id}
+                  src={getMediaUrl(activeMedia.media_url)}
+                  alt={
+                    activeMedia.title ||
+                    occasionData.name
+                  }
+                  className="max-w-[88vw] max-h-[80vh] object-contain"
+                />
+              )}
+
+              {/* COUNTER */}
+              {occasionMedia.length > 1 && (
+                <div className="absolute top-4 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-black/65 border border-white/10">
+                  <span className="text-[9px] uppercase tracking-[0.25em] text-white/65">
+                    {lightboxIndex + 1} / {occasionMedia.length}
+                  </span>
+                </div>
+              )}
+
+            </motion.div>
+
+
+            {/* TITLE */}
+            {activeMedia.title && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-center max-w-[80vw]">
+                <p className="text-white/75 font-serif text-lg">
+                  {activeMedia.title}
+                </p>
+
+                {activeMedia.description && (
+                  <p className="text-white/35 text-xs mt-1">
+                    {activeMedia.description}
+                  </p>
+                )}
+              </div>
+            )}
+
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </main>
   );

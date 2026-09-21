@@ -18,6 +18,20 @@ import {
 import { useAuth } from "../../context/AuthContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
+const BACKEND_URL = API_URL.replace("/api/v1", "");
+
+const getImageUrl = (url) => {
+  if (!url) return "";
+
+  if (
+    url.startsWith("http://") ||
+    url.startsWith("https://")
+  ) {
+    return url;
+  }
+
+  return `${BACKEND_URL}${url}`;
+};
 
 const emptyForm = {
   category_id: "",
@@ -25,6 +39,7 @@ const emptyForm = {
   description: "",
   price: "",
   image_url: "",
+  image_file: null,
   is_veg: true,
   is_spicy: 0,
   is_available: true,
@@ -47,7 +62,7 @@ const MenuPage = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form, setForm] = useState(emptyForm);
-
+  const [imagePreview, setImagePreview] = useState("");
   const [deleteItem, setDeleteItem] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -135,42 +150,51 @@ const MenuPage = () => {
     };
   }, [items]);
 
-  const openAddModal = () => {
-    setEditingItem(null);
+ const openAddModal = () => {
+  setEditingItem(null);
 
-    setForm({
-      ...emptyForm,
-      category_id: categories[0]?.id || "",
-    });
+  setForm({
+    ...emptyForm,
+    category_id: categories[0]?.id || "",
+  });
 
-    setModalOpen(true);
-  };
+  setImagePreview("");
+  setModalOpen(true);
+};
+  
+const openEditModal = (item) => {
+  setEditingItem(item);
 
-  const openEditModal = (item) => {
-    setEditingItem(item);
+  setForm({
+    category_id: item.category_id || "",
+    name: item.name || "",
+    description: item.description || "",
+    price: item.price || "",
+    image_url: item.image_url || "",
+    image_file: null,
+    is_veg: Boolean(item.is_veg),
+    is_spicy: item.is_spicy || 0,
+    is_available: Boolean(item.is_available),
+    is_featured: Boolean(item.is_featured),
+  });
 
-    setForm({
-      category_id: item.category_id || "",
-      name: item.name || "",
-      description: item.description || "",
-      price: item.price || "",
-      image_url: item.image_url || "",
-      is_veg: Boolean(item.is_veg),
-      is_spicy: item.is_spicy || 0,
-      is_available: Boolean(item.is_available),
-      is_featured: Boolean(item.is_featured),
-    });
+  setImagePreview(
+    item.image_url
+      ? getImageUrl(item.image_url)
+      : ""
+  );
 
-    setModalOpen(true);
-  };
-
+  setModalOpen(true);
+};
+   
   const closeModal = () => {
-    if (saving) return;
+  if (saving) return;
 
-    setModalOpen(false);
-    setEditingItem(null);
-    setForm(emptyForm);
-  };
+  setModalOpen(false);
+  setEditingItem(null);
+  setForm(emptyForm);
+  setImagePreview("");
+};
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -180,75 +204,165 @@ const MenuPage = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+const handleImageChange = (e) => {
+  const file = e.target.files?.[0];
 
+  if (!file) return;
+
+  const allowedTypes = [
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    showToast(
+      "Only JPG, JPEG, PNG and WEBP images are allowed.",
+      "error"
+    );
+
+    e.target.value = "";
+    return;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    showToast(
+      "Image size must be less than 5 MB.",
+      "error"
+    );
+
+    e.target.value = "";
+    return;
+  }
+
+  setForm((prev) => ({
+    ...prev,
+    image_file: file,
+  }));
+
+  setImagePreview(URL.createObjectURL(file));
+};
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    if (!form.category_id) {
-      showToast("Please select a category", "error");
-      return;
+  if (!form.category_id) {
+    showToast("Please select a category", "error");
+    return;
+  }
+
+  if (!form.name.trim()) {
+    showToast("Dish name is required", "error");
+    return;
+  }
+
+  if (!form.price || Number(form.price) <= 0) {
+    showToast("Enter a valid price", "error");
+    return;
+  }
+
+  setSaving(true);
+
+  try {
+    let imageUrl = form.image_url || null;
+
+    // -----------------------------------------
+    // UPLOAD NEW IMAGE IF SELECTED
+    // -----------------------------------------
+    if (form.image_file) {
+      const imageFormData = new FormData();
+
+      imageFormData.append(
+        "file",
+        form.image_file
+      );
+
+      const uploadResponse = await fetch(
+        `${API_URL}/menu/upload-image`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: imageFormData,
+        }
+      );
+
+      const uploadData =
+        await uploadResponse.json();
+
+      if (!uploadResponse.ok) {
+        throw new Error(
+          uploadData.detail ||
+            "Unable to upload image"
+        );
+      }
+
+      imageUrl = uploadData.url;
     }
 
-    if (!form.name.trim()) {
-      showToast("Dish name is required", "error");
-      return;
-    }
-
-    if (!form.price || Number(form.price) <= 0) {
-      showToast("Enter a valid price", "error");
-      return;
-    }
-
-    setSaving(true);
-
+    // -----------------------------------------
+    // CREATE / UPDATE MENU ITEM
+    // -----------------------------------------
     const payload = {
       category_id: Number(form.category_id),
       name: form.name.trim(),
-      description: form.description.trim() || null,
+      description:
+        form.description.trim() || null,
       price: Number(form.price),
-      image_url: form.image_url.trim() || null,
+      image_url: imageUrl,
       is_veg: Boolean(form.is_veg),
       is_spicy: Number(form.is_spicy),
-      is_available: Boolean(form.is_available),
-      is_featured: Boolean(form.is_featured),
+      is_available: Boolean(
+        form.is_available
+      ),
+      is_featured: Boolean(
+        form.is_featured
+      ),
     };
 
-    try {
-      const url = editingItem
-        ? `${API_URL}/menu/${editingItem.id}`
-        : `${API_URL}/menu`;
+    const url = editingItem
+      ? `${API_URL}/menu/${editingItem.id}`
+      : `${API_URL}/menu`;
 
-      const response = await fetch(url, {
-        method: editingItem ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
+    const response = await fetch(url, {
+      method: editingItem ? "PUT" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Unable to save menu item");
-      }
-
-      showToast(
-        editingItem
-          ? "Menu item updated successfully"
-          : "Menu item added successfully"
+    if (!response.ok) {
+      throw new Error(
+        data.detail ||
+          "Unable to save menu item"
       );
-
-      closeModal();
-      fetchMenu();
-    } catch (error) {
-      console.error(error);
-      showToast(error.message, "error");
-    } finally {
-      setSaving(false);
     }
-  };
 
+    showToast(
+      editingItem
+        ? "Menu item updated successfully"
+        : "Menu item added successfully"
+    );
+
+    closeModal();
+    fetchMenu();
+  } catch (error) {
+    console.error(error);
+
+    showToast(
+      error.message ||
+        "Something went wrong",
+      "error"
+    );
+  } finally {
+    setSaving(false);
+  }
+};
   const toggleAvailability = async (item) => {
     try {
       const response = await fetch(`${API_URL}/menu/${item.id}`, {
@@ -540,10 +654,10 @@ const MenuPage = () => {
                           <div className="w-14 h-14 shrink-0 bg-white/[0.04] overflow-hidden">
                             {item.image_url ? (
                               <img
-                                src={item.image_url}
-                                alt={item.name}
-                                className="w-full h-full object-cover"
-                              />
+  src={getImageUrl(item.image_url)}
+  alt={item.name}
+  className="w-full h-full object-cover"
+/>
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
                                 <UtensilsCrossed className="w-5 h-5 text-white/20" />
@@ -700,7 +814,7 @@ const MenuPage = () => {
               initial={{ opacity: 0, y: 20, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#101011] border border-white/[0.09] shadow-2xl"
+              className="relative w-full max-w-3xl max-h-[90vh] overflow-y-auto bg-[#101011] border border-white/[0.09] shadow-2xl"
             >
               <div className="sticky top-0 z-10 px-6 py-5 border-b border-white/[0.07] bg-[#101011] flex items-center justify-between">
                 <div>
@@ -781,15 +895,83 @@ const MenuPage = () => {
                     />
                   </FormField>
 
-                  <FormField label="Image URL">
-                    <input
-                      name="image_url"
-                      value={form.image_url}
-                      onChange={handleChange}
-                      placeholder="https://..."
-                      className="admin-input"
-                    />
-                  </FormField>
+              <FormField label="Dish Image">
+  <div className="space-y-3">
+    <label
+      htmlFor="dish-image"
+      className="block cursor-pointer"
+    >
+      <div className="border border-dashed border-white/[0.12] hover:border-[#f28a2e]/40 bg-white/[0.02] transition-colors px-4 py-3">
+        <div className="flex items-center gap-4">
+
+          {/* PREVIEW */}
+          <div className="w-16 h-16 shrink-0 overflow-hidden bg-white/[0.04] border border-white/[0.07] flex items-center justify-center">
+            {imagePreview ? (
+              <img
+                src={imagePreview}
+                alt="Dish preview"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <UtensilsCrossed className="w-5 h-5 text-white/20" />
+            )}
+          </div>
+
+          {/* TEXT */}
+          <div className="min-w-0 flex-1">
+            <p className="text-sm text-white/70 truncate">
+              {form.image_file
+                ? form.image_file.name
+                : editingItem && form.image_url
+                ? "Current dish image"
+                : "Choose dish image"}
+            </p>
+
+            <p className="text-[10px] text-white/30 mt-1">
+              JPG, JPEG, PNG or WEBP · Max 5 MB
+            </p>
+          </div>
+
+          {/* BUTTON */}
+          <span className="shrink-0 px-4 py-2 bg-[#f28a2e]/10 text-[#f28a2e] text-[10px] uppercase tracking-[0.15em]">
+            {form.image_file
+              ? "Change"
+              : "Upload"}
+          </span>
+        </div>
+      </div>
+
+      <input
+        id="dish-image"
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        onChange={handleImageChange}
+        className="hidden"
+      />
+    </label>
+
+    {form.image_file && (
+      <button
+        type="button"
+        onClick={() => {
+          setForm((prev) => ({
+            ...prev,
+            image_file: null,
+          }));
+
+          setImagePreview(
+            form.image_url
+              ? getImageUrl(form.image_url)
+              : ""
+          );
+        }}
+        className="text-[10px] text-white/35 hover:text-red-400 transition-colors"
+      >
+        Remove selected image
+      </button>
+    )}
+  </div>
+</FormField>
                 </div>
 
                 {/* DESCRIPTION */}

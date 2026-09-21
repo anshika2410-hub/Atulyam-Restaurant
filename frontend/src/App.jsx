@@ -29,6 +29,7 @@ import OrderTrackingPage from "./pages/public/OrderTrackingPage.jsx";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerLoginPage from "./pages/public/CustomerLoginPage.jsx";
 import AdminCustomersPage from "./pages/admin/CustomersPage.jsx";
+import AdminLayout from "./components/layout/AdminLayout.jsx";
 import {
   CustomerAuthProvider,
   useCustomerAuth,
@@ -360,9 +361,11 @@ function AppRoutes() {
   path="/admin/offers"
   element={
     <ProtectedRoute>
-      <PageTransition>
-        <AdminOffersPage />
-      </PageTransition>
+      <AdminLayout>
+        <PageTransition>
+          <AdminOffersPage />
+        </PageTransition>
+      </AdminLayout>
     </ProtectedRoute>
   }
 />
@@ -374,29 +377,35 @@ function AppRoutes() {
   path="/admin/catering"
   element={
     <ProtectedRoute>
-      <AdminCatering />
+      <AdminLayout>
+        <AdminCatering />
+      </AdminLayout>
     </ProtectedRoute>
   }
 />
 
           <Route
-            path="/admin/orders"
-            element={
-              <ProtectedRoute>
-                <PageTransition>
-                  <OrdersPage />
-                </PageTransition>
-              </ProtectedRoute>
-            }
-          />
+  path="/admin/orders"
+  element={
+    <ProtectedRoute>
+      <AdminLayout>
+        <PageTransition>
+          <OrdersPage />
+        </PageTransition>
+      </AdminLayout>
+    </ProtectedRoute>
+  }
+/>
 
 <Route
   path="/admin/customers"
   element={
     <ProtectedRoute>
-      <PageTransition>
-        <AdminCustomersPage />
-      </PageTransition>
+      <AdminLayout>
+        <PageTransition>
+          <AdminCustomersPage />
+        </PageTransition>
+      </AdminLayout>
     </ProtectedRoute>
   }
 />
@@ -405,17 +414,26 @@ function AppRoutes() {
   path="/admin/menu"
   element={
     <ProtectedRoute>
-      <PageTransition>
-        <AdminMenuPage />
-      </PageTransition>
+      <AdminLayout>
+        <PageTransition>
+          <AdminMenuPage />
+        </PageTransition>
+      </AdminLayout>
     </ProtectedRoute>
   }
 />
 
 <Route
   path="/admin/gallery"
-  element={<AdminGallery />}
+  element={
+    <ProtectedRoute>
+      <AdminLayout>
+        <AdminGallery />
+      </AdminLayout>
+    </ProtectedRoute>
+  }
 />
+
         {/* ================= 404 ================= */}
 
         <Route
