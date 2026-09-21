@@ -19,10 +19,10 @@ import { useAuth } from "../../context/AuthContext.jsx";
 
 const API_URL = import.meta.env.VITE_API_URL;
 const BACKEND_URL = API_URL.replace("/api/v1", "");
-
 const getImageUrl = (url) => {
   if (!url) return "";
 
+  // Full external URL
   if (
     url.startsWith("http://") ||
     url.startsWith("https://")
@@ -30,9 +30,18 @@ const getImageUrl = (url) => {
     return url;
   }
 
-  return `${BACKEND_URL}${url}`;
-};
+  // Existing frontend menu images
+  if (url.startsWith("/images/")) {
+    return url;
+  }
 
+  // Newly uploaded backend images
+  if (url.startsWith("/uploads/")) {
+    return `${BACKEND_URL}${url}`;
+  }
+
+  return url;
+};
 const emptyForm = {
   category_id: "",
   name: "",
