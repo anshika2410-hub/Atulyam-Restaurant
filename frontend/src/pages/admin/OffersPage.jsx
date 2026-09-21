@@ -920,11 +920,11 @@ const OffersPage = () => {
           color: rgba(255,255,255,0.22);
         }
 
-        .admin-input::-webkit-calendar-picker-indicator {
-          filter: invert(1);
-          opacity: 0.35;
-          cursor: pointer;
-        }
+       .admin-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 1;
+  cursor: pointer;
+}
       `}</style>
     </main>
   );
