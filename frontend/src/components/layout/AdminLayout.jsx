@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -58,9 +58,17 @@ const AdminLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleNavigate = (path) => {
+  const isActive = (path) => {
+    if (path === "/admin") {
+      return location.pathname === "/admin";
+    }
+
+    return location.pathname.startsWith(path);
+  };
+
+  const handleNavigation = (path) => {
     navigate(path);
     setSidebarOpen(false);
   };
@@ -91,10 +99,7 @@ const AdminLayout = ({ children }) => {
         {/* LOGO */}
         <div className="h-[88px] px-7 border-b border-white/10 flex items-center justify-between">
 
-          <button
-            onClick={() => handleNavigate("/admin")}
-            className="text-left"
-          >
+          <div>
             <div className="font-serif text-2xl tracking-tight">
               Atulyam
             </div>
@@ -102,11 +107,11 @@ const AdminLayout = ({ children }) => {
             <p className="text-[8px] uppercase tracking-[0.3em] text-[#f28a2e] mt-1">
               Admin Panel
             </p>
-          </button>
+          </div>
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white/40 hover:text-white transition"
+            className="lg:hidden text-white/40 hover:text-white"
           >
             <X className="w-5 h-5" />
           </button>
@@ -122,21 +127,17 @@ const AdminLayout = ({ children }) => {
 
           {menuItems.map((item) => {
             const Icon = item.icon;
-
-            const isActive =
-              item.path === "/admin"
-                ? location.pathname === "/admin"
-                : location.pathname.startsWith(item.path);
+            const active = isActive(item.path);
 
             return (
               <button
                 key={item.label}
-                onClick={() => handleNavigate(item.path)}
+                onClick={() => handleNavigation(item.path)}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3.5
                   text-left text-sm transition-all
                   ${
-                    isActive
+                    active
                       ? "bg-[#f28a2e]/10 text-[#f28a2e]"
                       : "text-white/45 hover:bg-white/[0.03] hover:text-white"
                   }
@@ -147,6 +148,16 @@ const AdminLayout = ({ children }) => {
                 <span className="flex-1">
                   {item.label}
                 </span>
+
+                {/* Orders badge */}
+                {item.label === "Orders" && (
+                  <span
+                    id="pending-orders-badge"
+                    className="hidden min-w-5 h-5 px-1 rounded-full bg-[#f28a2e] text-black text-[9px] font-bold items-center justify-center"
+                  >
+                    0
+                  </span>
+                )}
               </button>
             );
           })}
@@ -159,10 +170,20 @@ const AdminLayout = ({ children }) => {
             </p>
 
             <button
-              className="w-full flex items-center gap-3 px-4 py-3.5 text-sm text-white/45 hover:text-white hover:bg-white/[0.03] transition"
+              onClick={() => handleNavigation("/admin/settings")}
+              className={`
+                w-full flex items-center gap-3 px-4 py-3.5
+                text-left text-sm transition-all
+                ${
+                  isActive("/admin/settings")
+                    ? "bg-[#f28a2e]/10 text-[#f28a2e]"
+                    : "text-white/45 hover:bg-white/[0.03] hover:text-white"
+                }
+              `}
             >
               <Settings className="w-[17px] h-[17px]" />
-              Settings
+
+              <span>Settings</span>
             </button>
 
           </div>
@@ -175,7 +196,9 @@ const AdminLayout = ({ children }) => {
           <div className="flex items-center gap-3">
 
             <div className="w-9 h-9 rounded-full bg-[#f28a2e]/10 border border-[#f28a2e]/20 flex items-center justify-center text-[#f28a2e] font-serif">
-              {(user?.username || "A").charAt(0).toUpperCase()}
+              {(user?.username || "A")
+                .charAt(0)
+                .toUpperCase()}
             </div>
 
             <div className="flex-1 min-w-0">
@@ -213,20 +236,26 @@ const AdminLayout = ({ children }) => {
           {/* MOBILE HAMBURGER */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden text-white/60 hover:text-white transition"
+            className="lg:hidden text-white/60"
           >
             <Menu className="w-6 h-6" />
           </button>
 
-          {/* DESKTOP LABEL */}
+          {/* DESKTOP TITLE */}
           <div className="hidden lg:block">
+
             <p className="text-[9px] uppercase tracking-[0.28em] text-white/25">
               Restaurant Management
             </p>
+
+            <p className="text-[11px] text-white/40 mt-1">
+              Live operational overview
+            </p>
+
           </div>
 
-          {/* USER */}
-          <div className="flex items-center gap-5 ml-auto">
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-4">
 
             <div className="hidden sm:block text-right">
 
@@ -241,7 +270,9 @@ const AdminLayout = ({ children }) => {
             </div>
 
             <div className="w-9 h-9 rounded-full bg-[#f28a2e] text-black flex items-center justify-center font-serif">
-              {(user?.username || "A").charAt(0).toUpperCase()}
+              {(user?.username || "A")
+                .charAt(0)
+                .toUpperCase()}
             </div>
 
           </div>

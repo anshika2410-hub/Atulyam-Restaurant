@@ -6,6 +6,8 @@ import {
   Trash2,
   X,
   CalendarDays,
+  ChevronLeft,
+  ChevronRight,
   Tag,
   ToggleLeft,
   ToggleRight,
@@ -14,8 +16,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext.jsx";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ;
+const API_URL = import.meta.env.VITE_API_URL;
 
 const ease = [0.22, 1, 0.36, 1];
 
@@ -40,8 +41,16 @@ const OffersPage = () => {
   const [editingOffer, setEditingOffer] = useState(null);
 
   const [form, setForm] = useState(emptyForm);
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(new Date());
+
   const [deleteOfferData, setDeleteOfferData] = useState(null);
   const [toast, setToast] = useState(null);
+
+  // =========================================================
+  // TOAST
+  // =========================================================
 
   const showToast = (message, type = "success") => {
     setToast({ message, type });
@@ -66,7 +75,9 @@ const OffersPage = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.detail || "Unable to load offers");
+        throw new Error(
+          data.detail || "Unable to load offers"
+        );
       }
 
       setOffers(data);
@@ -93,238 +104,6 @@ const OffersPage = () => {
       inactive: offers.filter((offer) => !offer.is_active).length,
     };
   }, [offers]);
-
-  // =========================================================
-  // ADD
-  // =========================================================
-
-  const openAddModal = () => {
-    setEditingOffer(null);
-    setForm(emptyForm);
-    setShowModal(true);
-  };
-
-  // =========================================================
-  // EDIT
-  // =========================================================
-
-  const openEditModal = (offer) => {
-    setEditingOffer(offer);
-
-    setForm({
-      title: offer.title || "",
-      code: offer.code || "",
-      description: offer.description || "",
-      discount_percentage: offer.discount_percentage ?? "",
-      min_order_amount: offer.min_order_amount ?? "",
-      valid_until: offer.valid_until
-        ? formatDateForInput(offer.valid_until)
-        : "",
-      is_active: Boolean(offer.is_active),
-    });
-
-    setShowModal(true);
-  };
-
-  // =========================================================
-  // CLOSE MODAL
-  // =========================================================
-
-  const closeModal = () => {
-    if (saving) return;
-
-    setShowModal(false);
-    setEditingOffer(null);
-    setForm(emptyForm);
-  };
-
-  // =========================================================
-  // FORM CHANGE
-  // =========================================================
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  // =========================================================
-  // CREATE / UPDATE
-  // =========================================================
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!form.title.trim()) {
-      showToast("Offer title is required", "error");
-      return;
-    }
-
-    if (!form.code.trim()) {
-      showToast("Offer code is required", "error");
-      return;
-    }
-
-    if (
-      !form.discount_percentage ||
-      Number(form.discount_percentage) < 1 ||
-      Number(form.discount_percentage) > 100
-    ) {
-      showToast("Discount must be between 1% and 100%", "error");
-      return;
-    }
-
-    if (
-      form.min_order_amount === "" ||
-      Number(form.min_order_amount) < 0
-    ) {
-      showToast("Enter a valid minimum order amount", "error");
-      return;
-    }
-
-    setSaving(true);
-
-    const payload = {
-      title: form.title.trim(),
-      code: form.code.trim().toUpperCase(),
-      description: form.description.trim() || null,
-      discount_percentage: Number(form.discount_percentage),
-      min_order_amount: Number(form.min_order_amount || 0),
-      valid_until: form.valid_until
-        ? `${form.valid_until}T23:59:59`
-        : null,
-      is_active: Boolean(form.is_active),
-    };
-
-    try {
-      const url = editingOffer
-        ? `${API_URL}/offers/${editingOffer.id}`
-        : `${API_URL}/offers`;
-
-      const response = await fetch(url, {
-        method: editingOffer ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.detail || "Unable to save offer");
-      }
-
-      showToast(
-        editingOffer
-          ? "Offer updated successfully"
-          : "Offer created successfully"
-      );
-
-      closeModal();
-      fetchOffers();
-    } catch (error) {
-      console.error(error);
-      showToast(error.message, "error");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  // =========================================================
-  // TOGGLE ACTIVE / INACTIVE
-  // =========================================================
-
-  const toggleOffer = async (offer) => {
-    try {
-      const response = await fetch(
-        `${API_URL}/offers/${offer.id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            is_active: !offer.is_active,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Unable to update offer status"
-        );
-      }
-
-      setOffers((prev) =>
-        prev.map((item) =>
-          item.id === offer.id
-            ? {
-                ...item,
-                is_active: !offer.is_active,
-              }
-            : item
-        )
-      );
-
-      showToast(
-        offer.is_active
-          ? "Offer deactivated"
-          : "Offer activated"
-      );
-    } catch (error) {
-      console.error(error);
-      showToast(error.message, "error");
-    }
-  };
-
-  // =========================================================
-  // DELETE
-  // =========================================================
-
-  const confirmDelete = async () => {
-    if (!deleteOfferData) return;
-
-    try {
-      const response = await fetch(
-        `${API_URL}/offers/${deleteOfferData.id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          data.detail || "Unable to delete offer"
-        );
-      }
-
-      setOffers((prev) =>
-        prev.filter(
-          (offer) => offer.id !== deleteOfferData.id
-        )
-      );
-
-      setDeleteOfferData(null);
-
-      showToast("Offer deleted successfully");
-    } catch (error) {
-      console.error(error);
-      showToast(error.message, "error");
-    }
-  };
 
   // =========================================================
   // DATE HELPERS
@@ -356,10 +135,487 @@ const OffersPage = () => {
     }
 
     const year = parsedDate.getFullYear();
-    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-    const day = String(parsedDate.getDate()).padStart(2, "0");
+    const month = String(
+      parsedDate.getMonth() + 1
+    ).padStart(2, "0");
+    const day = String(
+      parsedDate.getDate()
+    ).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
+  };
+
+  const parseInputDate = (value) => {
+    if (!value) return null;
+
+    const [year, month, day] = value
+      .split("-")
+      .map(Number);
+
+    return new Date(year, month - 1, day);
+  };
+
+  const formatCalendarDate = (date) => {
+    const year = date.getFullYear();
+
+    const month = String(
+      date.getMonth() + 1
+    ).padStart(2, "0");
+
+    const day = String(
+      date.getDate()
+    ).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  };
+
+  const isSameDate = (a, b) => {
+    if (!a || !b) return false;
+
+    return (
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate()
+    );
+  };
+
+  // =========================================================
+  // CALENDAR
+  // =========================================================
+
+  const openDatePicker = () => {
+    const selectedDate = parseInputDate(
+      form.valid_until
+    );
+
+    setCalendarDate(
+      selectedDate || new Date()
+    );
+
+    setShowDatePicker(true);
+  };
+
+  const selectDate = (date) => {
+    setForm((prev) => ({
+      ...prev,
+      valid_until: formatCalendarDate(date),
+    }));
+
+    setShowDatePicker(false);
+  };
+
+  const changeMonth = (amount) => {
+    setCalendarDate(
+      (prev) =>
+        new Date(
+          prev.getFullYear(),
+          prev.getMonth() + amount,
+          1
+        )
+    );
+  };
+
+  const clearDate = () => {
+    setForm((prev) => ({
+      ...prev,
+      valid_until: "",
+    }));
+
+    setShowDatePicker(false);
+  };
+
+  const selectToday = () => {
+    const today = new Date();
+
+    setCalendarDate(today);
+    selectDate(today);
+  };
+
+  const calendarDays = useMemo(() => {
+    const year = calendarDate.getFullYear();
+    const month = calendarDate.getMonth();
+
+    const firstDay = new Date(
+      year,
+      month,
+      1
+    ).getDay();
+
+    const daysInMonth = new Date(
+      year,
+      month + 1,
+      0
+    ).getDate();
+
+    const daysInPreviousMonth = new Date(
+      year,
+      month,
+      0
+    ).getDate();
+
+    const days = [];
+
+    // Previous month
+    for (
+      let i = firstDay - 1;
+      i >= 0;
+      i--
+    ) {
+      days.push({
+        date: new Date(
+          year,
+          month - 1,
+          daysInPreviousMonth - i
+        ),
+        outside: true,
+      });
+    }
+
+    // Current month
+    for (
+      let day = 1;
+      day <= daysInMonth;
+      day++
+    ) {
+      days.push({
+        date: new Date(
+          year,
+          month,
+          day
+        ),
+        outside: false,
+      });
+    }
+
+    // Next month
+    let nextDay = 1;
+
+    while (days.length < 35) {
+      days.push({
+        date: new Date(
+          year,
+          month + 1,
+          nextDay
+        ),
+        outside: true,
+      });
+
+      nextDay++;
+    }
+
+    return days;
+  }, [calendarDate]);
+
+  // =========================================================
+  // ADD
+  // =========================================================
+
+  const openAddModal = () => {
+    setEditingOffer(null);
+    setForm({ ...emptyForm });
+    setShowDatePicker(false);
+    setCalendarDate(new Date());
+    setShowModal(true);
+  };
+
+  // =========================================================
+  // EDIT
+  // =========================================================
+
+  const openEditModal = (offer) => {
+    const formattedDate = offer.valid_until
+      ? formatDateForInput(
+          offer.valid_until
+        )
+      : "";
+
+    setEditingOffer(offer);
+
+    setForm({
+      title: offer.title || "",
+      code: offer.code || "",
+      description: offer.description || "",
+      discount_percentage:
+        offer.discount_percentage ?? "",
+      min_order_amount:
+        offer.min_order_amount ?? "",
+      valid_until: formattedDate,
+      is_active: Boolean(
+        offer.is_active
+      ),
+    });
+
+    const selectedDate =
+      parseInputDate(formattedDate);
+
+    setCalendarDate(
+      selectedDate || new Date()
+    );
+
+    setShowDatePicker(false);
+    setShowModal(true);
+  };
+
+  // =========================================================
+  // CLOSE MODAL
+  // =========================================================
+
+  const closeModal = () => {
+    if (saving) return;
+
+    setShowModal(false);
+    setShowDatePicker(false);
+    setEditingOffer(null);
+    setForm({ ...emptyForm });
+  };
+
+  // =========================================================
+  // FORM CHANGE
+  // =========================================================
+
+  const handleChange = (e) => {
+    const {
+      name,
+      value,
+      type,
+      checked,
+    } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        type === "checkbox"
+          ? checked
+          : value,
+    }));
+  };
+
+  // =========================================================
+  // CREATE / UPDATE
+  // =========================================================
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.title.trim()) {
+      showToast(
+        "Offer title is required",
+        "error"
+      );
+      return;
+    }
+
+    if (!form.code.trim()) {
+      showToast(
+        "Offer code is required",
+        "error"
+      );
+      return;
+    }
+
+    if (
+      !form.discount_percentage ||
+      Number(form.discount_percentage) < 1 ||
+      Number(form.discount_percentage) > 100
+    ) {
+      showToast(
+        "Discount must be between 1% and 100%",
+        "error"
+      );
+      return;
+    }
+
+    if (
+      form.min_order_amount === "" ||
+      Number(form.min_order_amount) < 0
+    ) {
+      showToast(
+        "Enter a valid minimum order amount",
+        "error"
+      );
+      return;
+    }
+
+    setSaving(true);
+
+    const payload = {
+      title: form.title.trim(),
+      code: form.code
+        .trim()
+        .toUpperCase(),
+      description:
+        form.description.trim() || null,
+      discount_percentage: Number(
+        form.discount_percentage
+      ),
+      min_order_amount: Number(
+        form.min_order_amount || 0
+      ),
+      valid_until: form.valid_until
+        ? `${form.valid_until}T23:59:59`
+        : null,
+      is_active: Boolean(
+        form.is_active
+      ),
+    };
+
+    try {
+      const url = editingOffer
+        ? `${API_URL}/offers/${editingOffer.id}`
+        : `${API_URL}/offers`;
+
+      const response = await fetch(
+        url,
+        {
+          method: editingOffer
+            ? "PUT"
+            : "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(
+            payload
+          ),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Unable to save offer"
+        );
+      }
+
+      showToast(
+        editingOffer
+          ? "Offer updated successfully"
+          : "Offer created successfully"
+      );
+
+      closeModal();
+      fetchOffers();
+    } catch (error) {
+      console.error(error);
+      showToast(
+        error.message,
+        "error"
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // =========================================================
+  // TOGGLE ACTIVE / INACTIVE
+  // =========================================================
+
+  const toggleOffer = async (offer) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/offers/${offer.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            is_active:
+              !offer.is_active,
+          }),
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Unable to update offer status"
+        );
+      }
+
+      setOffers((prev) =>
+        prev.map((item) =>
+          item.id === offer.id
+            ? {
+                ...item,
+                is_active:
+                  !offer.is_active,
+              }
+            : item
+        )
+      );
+
+      showToast(
+        offer.is_active
+          ? "Offer deactivated"
+          : "Offer activated"
+      );
+    } catch (error) {
+      console.error(error);
+      showToast(
+        error.message,
+        "error"
+      );
+    }
+  };
+
+  // =========================================================
+  // DELETE
+  // =========================================================
+
+  const confirmDelete = async () => {
+    if (!deleteOfferData) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/offers/${deleteOfferData.id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data =
+        await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.detail ||
+            "Unable to delete offer"
+        );
+      }
+
+      setOffers((prev) =>
+        prev.filter(
+          (offer) =>
+            offer.id !==
+            deleteOfferData.id
+        )
+      );
+
+      setDeleteOfferData(null);
+
+      showToast(
+        "Offer deleted successfully"
+      );
+    } catch (error) {
+      console.error(error);
+      showToast(
+        error.message,
+        "error"
+      );
+    }
   };
 
   return (
@@ -369,9 +625,18 @@ const OffersPage = () => {
         {/* HEADER */}
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease }}
+          initial={{
+            opacity: 0,
+            y: 20,
+          }}
+          animate={{
+            opacity: 1,
+            y: 0,
+          }}
+          transition={{
+            duration: 0.6,
+            ease,
+          }}
           className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10"
         >
           <div>
@@ -447,149 +712,186 @@ const OffersPage = () => {
         ) : (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-5">
             <AnimatePresence mode="popLayout">
-              {offers.map((offer, index) => (
-                <motion.article
-                  key={offer.id}
-                  layout
-                  initial={{
-                    opacity: 0,
-                    y: 25,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                  }}
-                  exit={{
-                    opacity: 0,
-                    scale: 0.96,
-                  }}
-                  transition={{
-                    duration: 0.45,
-                    delay: Math.min(index * 0.06, 0.3),
-                    ease,
-                  }}
-                  className="group bg-[#0d0d0d] border border-white/10 hover:border-[#f28a2e]/40 transition-colors duration-500 overflow-hidden"
-                >
-                  {/* OFFER HEADER */}
+              {offers.map(
+                (offer, index) => (
+                  <motion.article
+                    key={offer.id}
+                    layout
+                    initial={{
+                      opacity: 0,
+                      y: 25,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                    }}
+                    exit={{
+                      opacity: 0,
+                      scale: 0.96,
+                    }}
+                    transition={{
+                      duration: 0.45,
+                      delay: Math.min(
+                        index * 0.06,
+                        0.3
+                      ),
+                      ease,
+                    }}
+                    className="group bg-[#0d0d0d] border border-white/10 hover:border-[#f28a2e]/40 transition-colors duration-500 overflow-hidden"
+                  >
+                    {/* OFFER HEADER */}
 
-                  <div className="relative min-h-[170px] bg-gradient-to-br from-[#181818] via-[#101010] to-[#0a0a0a] p-6 flex flex-col justify-between overflow-hidden">
-                    <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full border border-[#f28a2e]/10" />
-                    <div className="absolute -right-10 -top-10 w-28 h-28 rounded-full border border-[#f28a2e]/10" />
+                    <div className="relative min-h-[170px] bg-gradient-to-br from-[#181818] via-[#101010] to-[#0a0a0a] p-6 flex flex-col justify-between overflow-hidden">
+                      <div className="absolute -right-16 -top-16 w-40 h-40 rounded-full border border-[#f28a2e]/10" />
 
-                    <div className="relative flex items-start justify-between gap-4">
-                      <span className="inline-flex bg-[#f28a2e] text-black px-3 py-2 text-[10px] uppercase tracking-[0.15em]">
-                        {offer.discount_percentage}% OFF
-                      </span>
+                      <div className="absolute -right-10 -top-10 w-28 h-28 rounded-full border border-[#f28a2e]/10" />
 
-                      <span
-                        className={`px-3 py-1.5 text-[8px] uppercase tracking-[0.18em] border ${
-                          offer.is_active
-                            ? "bg-green-500/10 text-green-400 border-green-400/20"
-                            : "bg-white/5 text-white/35 border-white/10"
-                        }`}
-                      >
-                        {offer.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </div>
+                      <div className="relative flex items-start justify-between gap-4">
+                        <span className="inline-flex bg-[#f28a2e] text-black px-3 py-2 text-[10px] uppercase tracking-[0.15em]">
+                          {offer.discount_percentage}% OFF
+                        </span>
 
-                    <div className="relative mt-8">
-                      <p className="text-[#f28a2e]/60 text-[8px] uppercase tracking-[0.3em] mb-2">
-                        Special Offer
-                      </p>
+                        <span
+                          className={`px-3 py-1.5 text-[8px] uppercase tracking-[0.18em] border ${
+                            offer.is_active
+                              ? "bg-green-500/10 text-green-400 border-green-400/20"
+                              : "bg-white/5 text-white/35 border-white/10"
+                          }`}
+                        >
+                          {offer.is_active
+                            ? "Active"
+                            : "Inactive"}
+                        </span>
+                      </div>
 
-                      <div className="font-serif text-5xl md:text-6xl text-white/90 leading-none">
-                        {offer.discount_percentage}%
+                      <div className="relative mt-8">
+                        <p className="text-[#f28a2e]/60 text-[8px] uppercase tracking-[0.3em] mb-2">
+                          Special Offer
+                        </p>
+
+                        <div className="font-serif text-5xl md:text-6xl text-white/90 leading-none">
+                          {offer.discount_percentage}%
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* CONTENT */}
+                    {/* CONTENT */}
 
-                  <div className="p-5 md:p-6">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <h2 className="font-serif text-2xl leading-tight">
-                          {offer.title}
-                        </h2>
+                    <div className="p-5 md:p-6">
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <h2 className="font-serif text-2xl leading-tight">
+                            {offer.title}
+                          </h2>
 
-                        <div className="flex items-center gap-2 mt-2">
-                          <Tag
-                            size={12}
-                            className="text-[#f28a2e]"
+                          <div className="flex items-center gap-2 mt-2">
+                            <Tag
+                              size={12}
+                              className="text-[#f28a2e]"
+                            />
+
+                            <span className="text-[#f28a2e] text-[9px] uppercase tracking-[0.18em]">
+                              {offer.code}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() =>
+                            toggleOffer(
+                              offer
+                            )
+                          }
+                          className="shrink-0 text-white/35 hover:text-[#f28a2e] transition-colors"
+                          title={
+                            offer.is_active
+                              ? "Deactivate offer"
+                              : "Activate offer"
+                          }
+                        >
+                          {offer.is_active ? (
+                            <ToggleRight
+                              size={27}
+                            />
+                          ) : (
+                            <ToggleLeft
+                              size={27}
+                            />
+                          )}
+                        </button>
+                      </div>
+
+                      <p className="text-white/35 text-xs leading-6 mt-3 line-clamp-2 min-h-[48px]">
+                        {offer.description ||
+                          "No description provided."}
+                      </p>
+
+                      <div className="flex flex-col gap-2 mt-5 text-white/30">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays
+                            size={14}
                           />
 
-                          <span className="text-[#f28a2e] text-[9px] uppercase tracking-[0.18em]">
-                            {offer.code}
+                          <span className="text-[9px] uppercase tracking-[0.15em]">
+                            Valid till{" "}
+                            {formatDate(
+                              offer.valid_until
+                            )}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <IndianRupee
+                            size={14}
+                          />
+
+                          <span className="text-[9px] uppercase tracking-[0.15em]">
+                            Min. order ₹
+                            {Number(
+                              offer.min_order_amount ||
+                                0
+                            ).toLocaleString(
+                              "en-IN"
+                            )}
                           </span>
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => toggleOffer(offer)}
-                        className="shrink-0 text-white/35 hover:text-[#f28a2e] transition-colors"
-                        title={
-                          offer.is_active
-                            ? "Deactivate offer"
-                            : "Activate offer"
-                        }
-                      >
-                        {offer.is_active ? (
-                          <ToggleRight size={27} />
-                        ) : (
-                          <ToggleLeft size={27} />
-                        )}
-                      </button>
-                    </div>
+                      {/* ACTIONS */}
 
-                    <p className="text-white/35 text-xs leading-6 mt-3 line-clamp-2 min-h-[48px]">
-                      {offer.description ||
-                        "No description provided."}
-                    </p>
+                      <div className="grid grid-cols-2 gap-2 mt-6">
+                        <button
+                          onClick={() =>
+                            openEditModal(
+                              offer
+                            )
+                          }
+                          className="h-11 border border-white/10 text-white/50 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.18em] hover:border-[#f28a2e] hover:text-[#f28a2e] transition-all"
+                        >
+                          <Pencil
+                            size={14}
+                          />
+                          Edit
+                        </button>
 
-                    <div className="flex flex-col gap-2 mt-5 text-white/30">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays size={14} />
-
-                        <span className="text-[9px] uppercase tracking-[0.15em]">
-                          Valid till{" "}
-                          {formatDate(offer.valid_until)}
-                        </span>
-                      </div>
-
-                      <div className="flex items-center gap-2">
-                        <IndianRupee size={14} />
-
-                        <span className="text-[9px] uppercase tracking-[0.15em]">
-                          Min. order ₹
-                          {Number(
-                            offer.min_order_amount || 0
-                          ).toLocaleString("en-IN")}
-                        </span>
+                        <button
+                          onClick={() =>
+                            setDeleteOfferData(
+                              offer
+                            )
+                          }
+                          className="h-11 border border-white/10 text-white/50 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.18em] hover:border-red-400/50 hover:text-red-400 transition-all"
+                        >
+                          <Trash2
+                            size={14}
+                          />
+                          Delete
+                        </button>
                       </div>
                     </div>
-
-                    {/* ACTIONS */}
-
-                    <div className="grid grid-cols-2 gap-2 mt-6">
-                      <button
-                        onClick={() => openEditModal(offer)}
-                        className="h-11 border border-white/10 text-white/50 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.18em] hover:border-[#f28a2e] hover:text-[#f28a2e] transition-all"
-                      >
-                        <Pencil size={14} />
-                        Edit
-                      </button>
-
-                      <button
-                        onClick={() => setDeleteOfferData(offer)}
-                        className="h-11 border border-white/10 text-white/50 flex items-center justify-center gap-2 text-[9px] uppercase tracking-[0.18em] hover:border-red-400/50 hover:text-red-400 transition-all"
-                      >
-                        <Trash2 size={14} />
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </motion.article>
-              ))}
+                  </motion.article>
+                )
+              )}
             </AnimatePresence>
           </div>
         )}
@@ -600,9 +902,15 @@ const OffersPage = () => {
       <AnimatePresence>
         {showModal && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
             className="fixed inset-0 z-[200] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
             onClick={closeModal}
           >
@@ -626,7 +934,9 @@ const OffersPage = () => {
                 duration: 0.35,
                 ease,
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) =>
+                e.stopPropagation()
+              }
               className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-[#101010] border border-white/10"
             >
               {/* HEADER */}
@@ -634,7 +944,9 @@ const OffersPage = () => {
               <div className="sticky top-0 z-10 flex items-center justify-between px-6 md:px-8 py-5 border-b border-white/10 bg-[#101010]">
                 <div>
                   <span className="text-[#f28a2e] text-[8px] uppercase tracking-[0.25em]">
-                    {editingOffer ? "Edit Offer" : "New Offer"}
+                    {editingOffer
+                      ? "Edit Offer"
+                      : "New Offer"}
                   </span>
 
                   <h2 className="font-serif text-2xl mt-1">
@@ -694,7 +1006,9 @@ const OffersPage = () => {
                         name="discount_percentage"
                         min="1"
                         max="100"
-                        value={form.discount_percentage}
+                        value={
+                          form.discount_percentage
+                        }
                         onChange={handleChange}
                         placeholder="20"
                         className="admin-input pr-10"
@@ -714,7 +1028,9 @@ const OffersPage = () => {
                         name="min_order_amount"
                         min="0"
                         step="0.01"
-                        value={form.min_order_amount}
+                        value={
+                          form.min_order_amount
+                        }
                         onChange={handleChange}
                         placeholder="1000"
                         className="admin-input pl-9"
@@ -731,13 +1047,219 @@ const OffersPage = () => {
                 {/* VALID UNTIL */}
 
                 <FormField label="Valid Till">
-                  <input
-                    type="date"
-                    name="valid_until"
-                    value={form.valid_until}
-                    onChange={handleChange}
-                    className="admin-input"
-                  />
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={
+                        openDatePicker
+                      }
+                      className="admin-input w-full flex items-center justify-between text-left"
+                    >
+                      <span
+                        className={
+                          form.valid_until
+                            ? "text-white"
+                            : "text-white/22"
+                        }
+                      >
+                        {form.valid_until
+  ? form.valid_until.split("-").reverse().join("/")
+  : "Select expiry date"}
+                      </span>
+
+                      <CalendarDays
+                        size={17}
+                        className="text-white shrink-0"
+                      />
+                    </button>
+
+                    <AnimatePresence>
+                      {showDatePicker && (
+                        <motion.div
+                          initial={{
+                            opacity: 0,
+                            y: -6,
+                            scale: 0.98,
+                          }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            scale: 1,
+                          }}
+                          exit={{
+                            opacity: 0,
+                            y: -6,
+                            scale: 0.98,
+                          }}
+                          transition={{
+                            duration: 0.15,
+                          }}
+                          className="absolute left-0 top-[58px] z-[50] w-[250px] max-w-[calc(100vw-3rem)] bg-[#111111] border border-white/10 shadow-2xl p-3"
+                          >
+                          {/* CALENDAR HEADER */}
+
+                          <div className="flex items-center justify-between mb-4">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                changeMonth(
+                                  -1
+                                )
+                              }
+                              className="w-8 h-8 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-[#f28a2e]/50 transition-all"
+                            >
+                              <ChevronLeft
+                                size={16}
+                              />
+                            </button>
+
+                            <div className="text-sm text-white font-medium">
+                              {calendarDate.toLocaleDateString(
+                                "en-IN",
+                                {
+                                  month:
+                                    "long",
+                                  year:
+                                    "numeric",
+                                }
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                changeMonth(
+                                  1
+                                )
+                              }
+                              className="w-8 h-8 flex items-center justify-center border border-white/10 text-white/50 hover:text-white hover:border-[#f28a2e]/50 transition-all"
+                            >
+                              <ChevronRight
+                                size={16}
+                              />
+                            </button>
+                          </div>
+
+                          {/* WEEKDAYS */}
+
+                          <div className="grid grid-cols-7 mb-2">
+                            {[
+                              "Su",
+                              "Mo",
+                              "Tu",
+                              "We",
+                              "Th",
+                              "Fr",
+                              "Sa",
+                            ].map(
+                              (day) => (
+                                <div
+                                  key={day}
+                                  className="h-8 flex items-center justify-center text-[9px] uppercase tracking-wider text-white/25"
+                                >
+                                  {day}
+                                </div>
+                              )
+                            )}
+                          </div>
+
+                          {/* DAYS */}
+
+                          <div className="grid grid-cols-7 gap-1">
+                            {calendarDays.map(
+                              (
+                                {
+                                  date,
+                                  outside,
+                                },
+                                index
+                              ) => {
+                                const selectedDate =
+                                  parseInputDate(
+                                    form.valid_until
+                                  );
+
+                                const today =
+                                  new Date();
+
+                                const selected =
+                                  selectedDate &&
+                                  isSameDate(
+                                    date,
+                                    selectedDate
+                                  );
+
+                                const isToday =
+                                  isSameDate(
+                                    date,
+                                    today
+                                  );
+
+                                return (
+                                  <button
+                                    key={`${date.getTime()}-${index}`}
+                                    type="button"
+                                    onClick={() =>
+                                      selectDate(
+                                        date
+                                      )
+                                    }
+                                    className={`
+                                      h-9 flex items-center justify-center text-xs transition-all
+                                      ${
+                                        outside
+                                          ? "text-white/10"
+                                          : "text-white/65 hover:bg-[#f28a2e]/15 hover:text-[#f28a2e]"
+                                      }
+                                      ${
+                                        selected
+                                          ? "bg-[#f28a2e] text-black hover:bg-[#f28a2e] hover:text-black"
+                                          : ""
+                                      }
+                                      ${
+                                        isToday &&
+                                        !selected
+                                          ? "border border-[#f28a2e]/40 text-[#f28a2e]"
+                                          : ""
+                                      }
+                                    `}
+                                  >
+                                    {date.getDate()}
+                                  </button>
+                                );
+                              }
+                            )}
+                          </div>
+
+                          {/* FOOTER */}
+
+                          <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/10">
+                            <button
+                              type="button"
+                              onClick={
+                                selectToday
+                              }
+                              className="text-[9px] uppercase tracking-[0.15em] text-[#f28a2e] hover:text-white transition-colors"
+                            >
+                              Today
+                            </button>
+
+                            {form.valid_until && (
+                              <button
+                                type="button"
+                                onClick={
+                                  clearDate
+                                }
+                                className="text-[9px] uppercase tracking-[0.15em] text-white/30 hover:text-white transition-colors"
+                              >
+                                Clear
+                              </button>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </FormField>
 
                 {/* DESCRIPTION */}
@@ -769,7 +1291,9 @@ const OffersPage = () => {
                   <input
                     type="checkbox"
                     name="is_active"
-                    checked={form.is_active}
+                    checked={
+                      form.is_active
+                    }
                     onChange={handleChange}
                     className="w-5 h-5 accent-[#f28a2e]"
                   />
@@ -777,28 +1301,28 @@ const OffersPage = () => {
 
                 {/* BUTTONS */}
 
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <button
-                    type="button"
-                    onClick={closeModal}
-                    disabled={saving}
-                    className="h-12 flex-1 border border-white/10 text-white/45 text-[10px] uppercase tracking-[0.2em] hover:border-white/25 hover:text-white transition-all disabled:opacity-40"
-                  >
-                    Cancel
-                  </button>
+<div className="grid grid-cols-2 gap-3">
+  <button
+    type="button"
+    onClick={closeModal}
+    disabled={saving}
+    className="w-full h-12 border border-white/10 text-white/45 text-[10px] uppercase tracking-[0.15em] hover:border-white/25 hover:text-white transition-all disabled:opacity-40"
+  >
+    Cancel
+  </button>
 
-                  <button
-                    type="submit"
-                    disabled={saving}
-                    className="h-12 flex-1 bg-[#f28a2e] text-black text-[10px] uppercase tracking-[0.2em] hover:bg-white transition-colors disabled:opacity-50"
-                  >
-                    {saving
-                      ? "Saving..."
-                      : editingOffer
-                      ? "Save Changes"
-                      : "Create Offer"}
-                  </button>
-                </div>
+  <button
+    type="submit"
+    disabled={saving}
+    className="w-full h-12 bg-[#f28a2e] text-black text-[10px] uppercase tracking-[0.15em] hover:bg-white transition-colors disabled:opacity-50"
+  >
+    {saving
+      ? "Saving..."
+      : editingOffer
+      ? "Save Changes"
+      : "Create Offer"}
+  </button>
+</div>
               </form>
             </motion.div>
           </motion.div>
@@ -810,11 +1334,19 @@ const OffersPage = () => {
       <AnimatePresence>
         {deleteOfferData && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            exit={{
+              opacity: 0,
+            }}
             className="fixed inset-0 z-[210] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
-            onClick={() => setDeleteOfferData(null)}
+            onClick={() =>
+              setDeleteOfferData(null)
+            }
           >
             <motion.div
               initial={{
@@ -829,7 +1361,9 @@ const OffersPage = () => {
                 opacity: 0,
                 scale: 0.96,
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) =>
+                e.stopPropagation()
+              }
               className="relative w-full max-w-md bg-[#111112] border border-white/[0.08] p-6"
             >
               <div className="w-11 h-11 bg-red-400/10 border border-red-400/20 flex items-center justify-center mb-5">
@@ -849,7 +1383,9 @@ const OffersPage = () => {
 
               <div className="flex gap-3 mt-7">
                 <button
-                  onClick={() => setDeleteOfferData(null)}
+                  onClick={() =>
+                    setDeleteOfferData(null)
+                  }
                   className="flex-1 py-3 border border-white/[0.08] text-sm text-white/50 hover:text-white transition-colors"
                 >
                   Cancel
@@ -895,6 +1431,8 @@ const OffersPage = () => {
         )}
       </AnimatePresence>
 
+      {/* STYLES */}
+
       <style>{`
         .admin-input {
           width: 100%;
@@ -908,10 +1446,6 @@ const OffersPage = () => {
           transition: border-color 0.2s ease;
         }
 
-        textarea.admin-input {
-          height: auto;
-        }
-
         .admin-input:focus {
           border-color: rgba(242,138,46,0.5);
         }
@@ -920,15 +1454,17 @@ const OffersPage = () => {
           color: rgba(255,255,255,0.22);
         }
 
-       .admin-input::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 1;
-  cursor: pointer;
-}
+        textarea.admin-input {
+          height: auto;
+        }
       `}</style>
     </main>
   );
 };
+
+// =========================================================
+// STAT CARD
+// =========================================================
 
 const StatCard = ({
   label,
@@ -938,7 +1474,9 @@ const StatCard = ({
 }) => (
   <div
     className={`border border-white/10 bg-[#0d0d0d] p-5 ${
-      hiddenMobile ? "hidden lg:block" : ""
+      hiddenMobile
+        ? "hidden lg:block"
+        : ""
     }`}
   >
     <p className="text-white/30 text-[9px] uppercase tracking-[0.2em]">
@@ -947,7 +1485,9 @@ const StatCard = ({
 
     <p
       className={`font-serif text-3xl mt-3 ${
-        accent ? "text-[#f28a2e]" : ""
+        accent
+          ? "text-[#f28a2e]"
+          : ""
       }`}
     >
       {value}
@@ -955,7 +1495,14 @@ const StatCard = ({
   </div>
 );
 
-const FormField = ({ label, children }) => (
+// =========================================================
+// FORM FIELD
+// =========================================================
+
+const FormField = ({
+  label,
+  children,
+}) => (
   <div>
     <label className="block text-white/35 text-[9px] uppercase tracking-[0.2em] mb-2">
       {label}
@@ -964,6 +1511,10 @@ const FormField = ({ label, children }) => (
     {children}
   </div>
 );
+
+// =========================================================
+// LOADING
+// =========================================================
 
 const LoadingState = () => (
   <div className="border border-white/10 min-h-[400px] flex flex-col items-center justify-center">

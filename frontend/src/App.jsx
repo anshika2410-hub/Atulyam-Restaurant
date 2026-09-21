@@ -30,6 +30,7 @@ import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import CustomerLoginPage from "./pages/public/CustomerLoginPage.jsx";
 import AdminCustomersPage from "./pages/admin/CustomersPage.jsx";
 import AdminLayout from "./components/layout/AdminLayout.jsx";
+import SettingsPage from "./pages/admin/SettingsPage.jsx";
 import {
   CustomerAuthProvider,
   useCustomerAuth,
@@ -429,6 +430,16 @@ function AppRoutes() {
     <ProtectedRoute>
       <AdminLayout>
         <AdminGallery />
+      </AdminLayout>
+    </ProtectedRoute>
+  }
+/>
+<Route
+  path="/admin/settings"
+  element={
+    <ProtectedRoute>
+      <AdminLayout>
+        <SettingsPage />
       </AdminLayout>
     </ProtectedRoute>
   }
