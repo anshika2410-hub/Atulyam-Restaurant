@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     SMTP_USE_TLS: bool = True
 
     DATABASE_URL: str = "mysql+pymysql://root:password@localhost:3306/atulyam_db"
-    SQLITE_DEV_FALLBACK: bool = True
+    SQLITE_DEV_FALLBACK: bool = False
 
     ALLOWED_ORIGINS: List[str] = [
         "https://atulyam-restaurant.vercel.app",
