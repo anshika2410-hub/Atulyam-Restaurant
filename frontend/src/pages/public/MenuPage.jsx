@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowDown,
@@ -136,12 +136,51 @@ const imageReveal = {
 /* -------------------------------------------------------------------------- */
 /*                                MENU ITEM                                   */
 /* -------------------------------------------------------------------------- */
-
 function MenuItem({ item, index, onClick }) {
+  const itemRef = useRef(null);
+
+  useEffect(() => {
+    const element = itemRef.current;
+    if (!element || !item.image) return;
+
+    const preload = () => {
+      const img = new Image();
+      img.src = item.image;
+    };
+
+    // Load image when the menu item comes near the viewport
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          preload();
+          observer.disconnect();
+        }
+      },
+      {
+        rootMargin: "300px",
+      }
+    );
+
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [item.image]);
+
+  const handleClick = () => {
+    // Start loading immediately as an extra safety measure
+    if (item.image) {
+      const img = new Image();
+      img.src = item.image;
+    }
+
+    onClick();
+  };
+
   return (
     <motion.button
+      ref={itemRef}
       type="button"
-      onClick={onClick}
+      onClick={handleClick}
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{
@@ -209,7 +248,6 @@ function MenuItem({ item, index, onClick }) {
     </motion.button>
   );
 }
-
 /* -------------------------------------------------------------------------- */
 /*                                MAIN PAGE                                   */
 /* -------------------------------------------------------------------------- */
