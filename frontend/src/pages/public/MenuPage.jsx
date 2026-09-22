@@ -215,10 +215,18 @@ function MenuItem({ item, index, onClick }) {
 /* -------------------------------------------------------------------------- */
 
 export default function MenuPage() {
-  const [menuItems, setMenuItems] = useState([]);
+const [menuItems, setMenuItems] = useState(() => {
+  try {
+    const cached = sessionStorage.getItem("atulyam_menu");
+    return cached ? JSON.parse(cached) : [];
+  } catch {
+    return [];
+  }
+});
 
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+
+const [error, setError] = useState("");
 
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
@@ -229,42 +237,60 @@ export default function MenuPage() {
   /*                                  FETCH                                   */
   /* ------------------------------------------------------------------------ */
 
-  useEffect(() => {
-    const fetchMenu = async () => {
-      try {
-        setLoading(true);
-        setError("");
+ useEffect(() => {
+  const fetchMenu = async () => {
+    try {
+      setError("");
 
-        const menuRes = await fetch(
-          `${API_URL}/menu?available_only=true`
-        );
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 10000);
 
-        if (!menuRes.ok) {
-          throw new Error("Failed to load menu.");
+      const menuRes = await fetch(
+        `${API_URL}/menu?available_only=true`,
+        {
+          signal: controller.signal,
+          cache: "no-store",
         }
+      );
 
-        const menuData = await menuRes.json();
+      clearTimeout(timeout);
 
-        setMenuItems(
-          Array.isArray(menuData)
-            ? menuData
-            : menuData.items || []
+      if (!menuRes.ok) {
+        throw new Error("Failed to load menu.");
+      }
+
+      const menuData = await menuRes.json();
+
+      const items = Array.isArray(menuData)
+        ? menuData
+        : menuData.items || [];
+
+      setMenuItems(items);
+
+      try {
+        sessionStorage.setItem(
+          "atulyam_menu",
+          JSON.stringify(items)
         );
-      } catch (err) {
-        console.error("Menu fetch error:", err);
+      } catch {
+        // Ignore storage errors
+      }
+    } catch (err) {
+      console.error("Menu fetch error:", err);
 
+      if (err.name === "AbortError") {
+        setError("Menu is taking too long to load. Please try again.");
+      } else {
         setError(
           err?.message ||
             "Unable to load menu right now. Please try again."
         );
-      } finally {
-        setLoading(false);
       }
-    };
+    }
+  };
 
-    fetchMenu();
-  }, []);
-
+  fetchMenu();
+}, []);
   /* ------------------------------------------------------------------------ */
   /*                         CATEGORY DATA FROM MENU                          */
   /* ------------------------------------------------------------------------ */
@@ -461,30 +487,10 @@ export default function MenuPage() {
   };
 
   /* ------------------------------------------------------------------------ */
-  /*                                  LOADING                                 */
-  /* ------------------------------------------------------------------------ */
-
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-[#0c0b09] text-white">
-        <section className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-10 h-10 border border-white/20 border-t-[#f28a2e] rounded-full animate-spin mx-auto mb-6" />
-
-            <p className="text-white/40 text-xs uppercase tracking-[0.3em]">
-              Loading Menu
-            </p>
-          </div>
-        </section>
-      </main>
-    );
-  }
-
-  /* ------------------------------------------------------------------------ */
   /*                                   ERROR                                  */
   /* ------------------------------------------------------------------------ */
 
-  if (error) {
+  if (error && menuItems.length === 0) {
     return (
       <main className="min-h-screen bg-[#0c0b09] text-white">
         <section className="min-h-screen flex items-center justify-center px-6">
@@ -670,6 +676,15 @@ export default function MenuPage() {
 
       <section className="px-6 md:px-12 lg:px-20 py-24 md:py-32">
         <div className="space-y-20 md:space-y-28">
+
+          {menuItems.length === 0 && !error && (
+            <div className="py-16 text-center">
+              <div className="w-8 h-8 border border-white/15 border-t-[#f28a2e] rounded-full animate-spin mx-auto mb-5" />
+              <p className="text-white/25 text-[10px] uppercase tracking-[0.25em]">
+                Loading dishes
+              </p>
+            </div>
+          )}
 
           {visibleSections.map(
             (section, sectionIndex) => {
