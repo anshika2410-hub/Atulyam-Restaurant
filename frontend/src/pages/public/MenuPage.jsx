@@ -444,39 +444,44 @@ const [error, setError] = useState("");
   /* ------------------------------------------------------------------------ */
 
   const scrollToCategory = (categoryName) => {
-    setSearch("");
-    setActiveCategory(categoryName);
+  setSearch("");
+  setActiveCategory(categoryName);
 
-    if (categoryName === "All") {
-      window.scrollTo({
-        top: 650,
-        behavior: "smooth",
-      });
+  if (categoryName === "All") {
+    window.scrollTo({
+      top: 650,
+      behavior: "smooth",
+    });
+    return;
+  }
 
-      return;
-    }
-
+  const scrollToElement = () => {
     const element = document.getElementById(
       `category-${categoryName
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")}`
     );
 
-    if (element) {
-      const offset = 130;
+    if (!element) return;
 
-      const top =
-        element.getBoundingClientRect().top +
-        window.scrollY -
-        offset;
+    const offset = 130;
 
-      window.scrollTo({
-        top,
-        behavior: "smooth",
-      });
-    }
+    const top =
+      element.getBoundingClientRect().top +
+      window.scrollY -
+      offset;
+
+    window.scrollTo({
+      top,
+      behavior: "smooth",
+    });
   };
 
+  // Wait for React to apply the active category filter
+  requestAnimationFrame(() => {
+    requestAnimationFrame(scrollToElement);
+  });
+};
   /* ------------------------------------------------------------------------ */
   /*                              CLEAR SEARCH                               */
   /* ------------------------------------------------------------------------ */
